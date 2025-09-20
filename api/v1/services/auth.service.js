@@ -1,11 +1,8 @@
 import User from "../models/user.model.js";
 import bcrypt from 'bcryptjs';
-import jwt from "jsonwebtoken";
-
-export const sign = (user) => jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+import { sign } from "../utils/sign.utils.js";
 
 export const registerService = async ({ email, password }) => {
-    
     const userExiste = await User.findOne({ email });
     if (userExiste) {
         let error = new Error("No se ha podido registrar el usuario");

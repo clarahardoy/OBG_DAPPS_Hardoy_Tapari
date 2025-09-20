@@ -25,8 +25,3 @@ app.use(errorMiddleware);
 app.listen(port, () => {
   console.log(`Servidor levantado en http://localhost:${port}`);
 });
-
-app.use((req, res, next) => {
-  res.status(404).json({ message: 'No se encontró el recurso' });
-  next();
-});
