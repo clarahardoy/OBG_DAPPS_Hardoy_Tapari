@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from 'bcryptjs';
 import { sign } from "../utils/sign.utils.js";
 
-export const registerService = async ({ email, password }) => {
+export const registerService = async ({ email, password, name, surname, role }) => {
     const userExiste = await User.findOne({ email });
     if (userExiste) {
         let error = new Error("No se ha podido registrar el usuario");
@@ -10,7 +10,7 @@ export const registerService = async ({ email, password }) => {
         throw error;
     }
     const hashPassword = bcrypt.hashSync(password, 12);
-    const user = new User({ email, password: hashPassword });
+    const user = new User({ email, password: hashPassword, name, surname, role });
     await user.save();
     const token = sign(user);
     return token;
