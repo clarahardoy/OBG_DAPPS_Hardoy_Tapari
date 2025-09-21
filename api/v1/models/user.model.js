@@ -10,8 +10,8 @@ const userSchema = new Schema({
     surname: { type: String, required: false },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    membership: { type: MembershipModel, required: false },
-    shelf: { type: ShelfModel, required: false },
+    membership: { type: Schema.Types.ObjectId, ref: 'Membership', required: false },
+    shelf: { type: Schema.Types.ObjectId, ref: 'Shelf', required: false },
     role: { type: String, required: true, default: 'user', enum: ['admin', 'user'] },
    // agregar cuando este lo de vale -- reviews: { type: ReviewModel, required: true },
 
