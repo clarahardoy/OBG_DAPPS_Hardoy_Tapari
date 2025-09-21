@@ -5,7 +5,6 @@ import MembershipModel from './membership.model.js';
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
-    id: { type: String, required: true, unique: true },
     name: { type: String, required: false },
     surname: { type: String, required: false },
     email: { type: String, required: true, unique: true },
