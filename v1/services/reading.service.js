@@ -1,10 +1,10 @@
-import readingModel from "../models/reading.model";
+import ReadingModel from "../models/reading.model";
 
 // Agreagr una nueva lectura POST
 export const createReadingService = async (readingData) => {
     try {
         // Pensar que validaciones hacer
-        const newReading = new readingModel(readingData);
+        const newReading = new ReadingModel(readingData);
         await newReading.save();
         return newReading;
     } catch (error) {
@@ -17,7 +17,7 @@ export const createReadingService = async (readingData) => {
 // Obtener todas las lecturas GET
 export const getAllReadingsService = async () => {
     // Buscar todas las lecturas y popular el campo book
-    const readings = await readingModel.find().populate('book');
+    const readings = await ReadingModel.find().populate('book');
 
     // Si no se encontraron lecturas avisar con error 404
     if (!readings) {
@@ -34,7 +34,7 @@ export const getAllReadingsService = async () => {
 export const getReadingByIdService = async (id) => {
     let reading;
     try {
-        reading = await readingModel.findById(id).populate('book');
+        reading = await ReadingModel.findById(id).populate('book');
     } catch (error) {
         let err = new Error('Error al encotrar la lectura');
         err.status = 400;
@@ -55,7 +55,7 @@ export const updateReadingByIdService = async (id, updateData) => {
     let updatedReading;
     // Pensar que validaciones hacer
     try {
-        updatedReading = await readingModel.findByIdAndUpdate(id, updateData, { new: true }).populate('book');
+        updatedReading = await ReadingModel.findByIdAndUpdate(id, updateData, { new: true }).populate('book');
     } catch (error) {
         let err = new Error('Error al actualizar la lectura');
         err.status = 400;

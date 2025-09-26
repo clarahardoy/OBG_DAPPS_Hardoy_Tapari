@@ -1,0 +1,23 @@
+import Joi from 'joi';
+
+export const reviewSchema = Joi.object({
+    userId: Joi.string().required().message({
+        'any.required': 'El campo Usuario es obligatorio',
+        'string.empty': 'El campo Usuario no puede estar vacío'
+    }),
+    bookId: Joi.string().required().message({
+        'any.required': 'El campo Libro es obligatorio',
+        'string.empty': 'El campo Libro no puede estar vacío'
+    }),
+    rating: Joi.number().min(0).max(5).required().message({
+        'any.required': 'El campo Calificación es obligatorio',
+        'number.base': 'El campo Calificación debe ser un número',
+        'number.min': 'El campo Calificación debe ser al menos 0',
+        'number.max': 'El campo Calificación debe ser como máximo 5'
+    }),
+    comment: Joi.string().required().message({
+        'any.required': 'El campo Comentario es obligatorio',
+        'string.empty': 'El campo Comentario no puede estar vacío'
+    }),
+    date: Joi.date()
+});
