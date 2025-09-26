@@ -1,7 +1,7 @@
 import express from 'express';
 import AUTH_ROUTES from './routes/auth.routes.js';
 import USER_ROUTES from './routes/user.routes.js';
-import { authenticate } from './middlewares/auth.middleware.js';
+import { authenticate } from './middlewares/authenticate.middleware.js';
 
 const router = express.Router({mergeParams: true});
 

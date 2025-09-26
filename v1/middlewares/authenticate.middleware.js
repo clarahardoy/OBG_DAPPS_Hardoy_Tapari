@@ -13,7 +13,7 @@ export const authenticate = (req, res, next) => {
   if (err) {
     return res.status(403).json({ message: "Token inválido", error: "Acceso denegado" });
   }
-  req.user = user.username;
+  req.email = user.email;
   next();
  });
 };
