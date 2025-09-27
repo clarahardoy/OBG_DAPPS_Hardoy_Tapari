@@ -10,9 +10,10 @@ import { validateObjectIdMiddleware }
     from '../middlewares/validate-object-id.middleware.js';
 import { createBookSchema }
     from '../validators/book.validator.js';
+const router = express.Router({ mergeParams: true });
 
 router.post('/', validateBody(createBookSchema), createBookController);
 router.get('/', getBooksController);
 router.get('/:bookId', validateObjectIdMiddleware, getBookByIdController);
 
-const router = express.Router({ mergeParams: true });
+export default router;

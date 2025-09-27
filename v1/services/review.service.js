@@ -1,8 +1,8 @@
-import ReviewModel from "../models/review.model";
+import Review from "../models/review.model.js";
 
 export const createReviewService = async (reviewData) => {
     try {
-        const newReview = new ReviewModel(reviewData);
+        const newReview = new Review(reviewData);
         await newReview.save();
         return newReview;
     } catch (error) {
@@ -13,13 +13,13 @@ export const createReviewService = async (reviewData) => {
 };
 
 export const getAllReviewsService = async () => {
-    return await ReviewModel.find().populate('userId').populate('bookId');
+    return await Review.find().populate('userId').populate('bookId');
 };
 
 export const getReviewByIdService = async (id) => {
     let review;
     try {
-        review = await ReviewModel.findById(id).populate('userId').populate('bookId');
+        review = await Review.findById(id).populate('userId').populate('bookId');
     } catch (error) {
         let err = new Error('Error al encontrar la reseña');
         err.status = 400;
@@ -38,7 +38,7 @@ export const getReviewByIdService = async (id) => {
 export const deleteReviewByIdService = async (id) => {
     let deletedReview;
     try {
-        deletedReview = await ReviewModel.findByIdAndDelete(id);
+        deletedReview = await Review.findByIdAndDelete(id);
     } catch (error) {
         let err = new Error('Error al eliminar la reseña');
         err.status = 400;

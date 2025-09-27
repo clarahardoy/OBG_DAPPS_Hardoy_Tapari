@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-    createReadingContoller,
+    createReadingController,
     getAllReadingsController,
     getReadingByIdController,
     updateReadingByIdController
@@ -8,13 +8,13 @@ import {
 import { validateBody }
     from '../middlewares/validate-body.middleware.js';
 import { validateObjectIdMiddleware }
-    from '../middlewares/validate-object-id.middleware.js
+    from '../middlewares/validate-object-id.middleware.js';
 import { addReadingSchema }
-    from '../validators/reading.validator.js';
+    from '../validators/reading.validators.js';
 
 const router = express.Router({ mergeParams: true });
 
-router.post('/', validateBody(addReadingSchema), createReadingContoller);
+router.post('/', validateBody(addReadingSchema), createReadingController);
 router.get('/', getAllReadingsController);
 router.get('/:id', validateObjectIdMiddleware, getReadingByIdController);
 router.patch('/:id', validateObjectIdMiddleware, updateReadingByIdController);

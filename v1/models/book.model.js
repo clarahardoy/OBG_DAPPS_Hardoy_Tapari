@@ -11,4 +11,4 @@ const bookSchema = new Schema({
     publicationDate: { type: Date, required: true }
 });
 
-export default model('Book', reviewSchema);
+export default model('Book', bookSchema);

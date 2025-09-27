@@ -1,19 +1,19 @@
-import bookModel from "../models/book.model";
+import Book from "../models/book.model.js";
 
 export const createBookService = async (bookData) => {
-    const newBook = new bookModel(bookData);
+    const newBook = new Book(bookData);
     await newBook.save();
     return newBook;
 };
 
 export const getBooksService = async () => {
-    return await bookModel.find();
+    return await Book.find();
 };
 
 export const getBookByIdService = async (bookId) => {
     let book;
     try {
-        book = await bookModel.findById(bookId);
+        book = await Book.findById(bookId);
     } catch (error) {
         let err = new Error('Error al buscar el libro');
         err.status = 400;
