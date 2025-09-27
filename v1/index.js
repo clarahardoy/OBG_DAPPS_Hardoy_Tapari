@@ -3,6 +3,7 @@ import AUTH_ROUTES from './routes/auth.routes.js';
 import USER_ROUTES from './routes/user.routes.js';
 import READING_ROUTES from './routes/reading.routes.js';
 import REVIEW_ROUTES from './routes/review.routes.js';
+import BOOK_ROUTES from './routes/book.routes.js';
 import { authenticate } from './middlewares/authenticate.middleware.js';
 
 const router = express.Router({ mergeParams: true });
@@ -15,5 +16,6 @@ router.use(authenticate);
 router.use('/users', USER_ROUTES);
 router.use('/readings', READING_ROUTES);
 router.use('/reviews', REVIEW_ROUTES);
+router.use('/books', BOOK_ROUTES);
 
 export default router;
