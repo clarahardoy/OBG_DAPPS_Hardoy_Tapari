@@ -1,4 +1,5 @@
 import { createBookService, getBooksService, getBookByIdService } from "../services/book.service.js";
+// Conumir acá la API de libros, req: infoBook de la API externa
 
 export const createBookController = async (req, res) => {
     try {

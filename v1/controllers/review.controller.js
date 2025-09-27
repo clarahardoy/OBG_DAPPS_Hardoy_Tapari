@@ -34,6 +34,8 @@ export const getReviewByIdController = async (req, res) => {
     }
 };
 
+// updateReviewByIdController pending
+
 export const deleteReviewByIdController = async (req, res) => {
     try {
         const { id } = req.params;

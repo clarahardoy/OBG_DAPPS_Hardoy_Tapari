@@ -45,4 +45,4 @@ export const updateReadingByIdController = async (req, res) => {
     };
 };
 
-// Hacemos un eliminar reading?
+// Eliminar lectura por id - pendiente deleteReadingByIdController
