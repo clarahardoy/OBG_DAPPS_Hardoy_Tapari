@@ -4,7 +4,9 @@ import USER_ROUTES from './routes/user.routes.js';
 import READING_ROUTES from './routes/reading.routes.js';
 import REVIEW_ROUTES from './routes/review.routes.js';
 import BOOK_ROUTES from './routes/book.routes.js';
-import { authenticate } from './middlewares/authenticate.middleware.js';
+import SHELF_ROUTES from './routes/shelf.routes.js';
+import { authenticateMiddleware } from './middlewares/authenticate.middleware.js';
+import { authorizeRoleMiddleware } from './middlewares/authorize-role.middleware.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -12,10 +14,11 @@ const router = express.Router({ mergeParams: true });
 router.use('/auth', AUTH_ROUTES);
 
 //rutas protegidas
-router.use(authenticate);
-router.use('/users', USER_ROUTES);
+router.use(authenticateMiddleware);
 router.use('/readings', READING_ROUTES);
+router.use('/shelves', SHELF_ROUTES);
 router.use('/reviews', REVIEW_ROUTES);
 router.use('/books', BOOK_ROUTES);
+router.use('/users', authorizeRoleMiddleware(['admin']), USER_ROUTES);
 
 export default router;
