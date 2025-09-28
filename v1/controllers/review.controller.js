@@ -1,14 +1,29 @@
-//ENDPOINTS:
-//GET /api/v1/reviews (para ver reviews)
-//POST /api/books/:bookId/reviews (crear review nueva)
-//PATCH /api/reviews/:reviewId (updatear review)
-//DELETE /api/reviews/:reviewId (borrar review)
 import {
     createReviewService,
     getAllReviewsService,
     getReviewByIdService,
     deleteReviewByIdService
 } from "../services/review.service.js";
+
+/*ENDPOINTS:
+    createReview(readingId, reviewData, userId): 
+        - validar que la reading esté terminada (status)
+        - validar que no exista una review para esa reading
+        - crear la review
+        - retornar la review
+
+    getAllReviews(): 
+        - obtener todas las reviews
+        - retornar las reviews
+
+    getReviewById(id): 
+        - obtener la review por id
+        - retornar la review
+
+    deleteReviewById(id): 
+        - eliminar la review por id
+        - retornar la review eliminada
+*/
 
 export const createReviewController = async (req, res) => {
     try {

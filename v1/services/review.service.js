@@ -1,5 +1,22 @@
 import Review from "../models/review.model.js";
 
+/* FALTAN:
+    validateStatusIsOk():
+        - validar que el status sea válido para crear una review (finished)
+        - retornar el status
+
+    createReview(): 
+        - llamar a validateStatusIsOk()
+        - crear la review
+        - retornar la review
+
+    updateDatesOfReview(): 
+        - validar que el status sea válido (finished)
+        - actualizar las fechas de la review usando el middleware setReadingDateMiddleware
+        - retornar la review
+)
+*/
+
 export const createReviewService = async (reviewData) => {
     try {
         const newReview = new Review(reviewData);

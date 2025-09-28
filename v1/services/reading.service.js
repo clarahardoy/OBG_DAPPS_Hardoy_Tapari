@@ -1,5 +1,11 @@
 import Reading from "../models/reading.model.js";
 
+/* podríamos agregar getUserReadingStats() para poder hacer lo de estadisticas:
+    - cantidad de libros leídos en {{ mes / año}} (getBooksReadByYear(), getBooksReadByMonth())
+    - cantidad de paginas leídas en {{ mes / año}} (getTotalPagesRead())
+    - genero más leido (getMostReadGenre())
+*/
+
 // Agreagr una nueva lectura POST
 export const createReadingService = async (readingData) => {
     try {

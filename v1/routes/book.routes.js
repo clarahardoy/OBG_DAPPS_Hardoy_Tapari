@@ -1,19 +1,10 @@
 import express from 'express';
-import {
-    createBookController,
-    getBooksController,
-    getBookByIdController
-} from '../controllers/book.controller.js';
-import { validateBody }
-    from '../middlewares/validate-body.middleware.js';
-import { validateObjectIdMiddleware }
-    from '../middlewares/validate-object-id.middleware.js';
-import { createBookSchema }
-    from '../validators/book.validator.js';
+import { BookController } from '../controllers/book.controller.js';
+
 const router = express.Router({ mergeParams: true });
 
-router.post('/', validateBody(createBookSchema), createBookController);
-router.get('/', getBooksController);
-router.get('/:bookId', validateObjectIdMiddleware, getBookByIdController);
+router.get('/search', BookController.searchBooks);
+router.get('/search/advanced', BookController.searchBooksByFilter);
+router.get('/google/:googleBooksId', BookController.getBookFromApiById);
 
 export default router;
