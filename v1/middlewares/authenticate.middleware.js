@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-export const authenticate = (req, res, next) => {
+export const authenticateMiddleware = (req, res, next) => {
   const authHeaders = req.headers.authorization;
   if (!authHeaders) {
     return res.status(401).json({ message: "Sin headers de autorización", error: "No autorizado" });

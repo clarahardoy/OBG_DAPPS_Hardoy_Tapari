@@ -1,26 +1,36 @@
 import User from "../models/user.model.js";
 
-export const getUserByIdService = async (id) => {
-    const user = await User.findById(id).populate('shelf').populate('membership');
-    return user;
-}
+export const UserService = {
+    getUserById: async (id) => {
+        const user = await User.findById(id).populate('shelf').populate('membership');
+        if (!user) {
+            throw new Error('Usuario no encontrado');
+        }
+        return user;
+        
+},
 
-export const getUsersService = async () => {
-    const users = await User.find().populate('shelf').populate('membership');
-    return users;
-}
+    getUsers: async () => {
+        const users = await User.find().populate('shelf').populate('membership');
+        if (!users) {
+            throw new Error('Usuarios no encontrados');
+        }
+        return users;
+},
 
-export const createUserService = async (user) => {
-    const newUser = await User.create(user);
-    return newUser;
-}
+    updateUser: async (id, user) => {
+        const updatedUser = await User.findByIdAndUpdate(id, user, { new: true });
+        if (!updatedUser) {
+            throw new Error('Usuario no encontrado');
+        }
+        return updatedUser;
+},
 
-export const updateUserService = async (id, user) => {
-    const updatedUser = await User.findByIdAndUpdate(id, user, { new: true });
-    return updatedUser;
+    deleteUser: async (id) => {
+        const deleted = await User.findByIdAndDelete(id);
+        if (!deleted) {
+            throw new Error('Usuario no encontrado');
+        }
+        return { message: "Usuario eliminado OK", deleted };
 }
-
-export const deleteUserService = async (id) => {
-    const deleted = await User.findByIdAndDelete(id);
-    return { message: "Usuario eliminado OK", deleted };
 }

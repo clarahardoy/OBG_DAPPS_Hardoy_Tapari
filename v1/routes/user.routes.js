@@ -1,14 +1,14 @@
 
 import express from 'express';
-import { getUsers, getUserById, createUser, updateUser, deleteUser } from '../controllers/user.controller.js';
+import { UserController } from '../controllers/user.controller.js';
 import { validateObjectIdMiddleware } from '../middlewares/validate-object-id.middleware.js';
 
 const USER_ROUTES = express.Router({mergeParams: true});
 
-USER_ROUTES.get('/', getUsers); 
-USER_ROUTES.get('/:id', validateObjectIdMiddleware, getUserById);
-USER_ROUTES.post('/', createUser);
-USER_ROUTES.put('/:id', validateObjectIdMiddleware, updateUser);
-USER_ROUTES.delete('/:id', validateObjectIdMiddleware, deleteUser);
+USER_ROUTES.get('/', UserController.getUsers); 
+USER_ROUTES.get('/:id', validateObjectIdMiddleware, UserController.getUserById);
+USER_ROUTES.post('/', UserController.createUser);
+USER_ROUTES.put('/:id', validateObjectIdMiddleware, UserController.updateUser);
+USER_ROUTES.delete('/:id', validateObjectIdMiddleware, UserController.deleteUser);
 
 export default USER_ROUTES;
