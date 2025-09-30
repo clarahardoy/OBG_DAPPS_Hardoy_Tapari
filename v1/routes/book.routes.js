@@ -1,10 +1,10 @@
 import express from 'express';
 import { BookController } from '../controllers/book.controller.js';
 
-const router = express.Router({ mergeParams: true });
+const BOOK_ROUTES = express.Router({ mergeParams: true });
 
-router.get('/search', BookController.searchBooks);
-router.get('/search/advanced', BookController.searchBooksByFilter);
-router.get('/google/:googleBooksId', BookController.getBookFromApiById);
+BOOK_ROUTES.get('/search', BookController.searchBooks);
+BOOK_ROUTES.get('/search/advanced', BookController.searchBooksByFilter);
+BOOK_ROUTES.get('/google/:googleBooksId', BookController.getBookFromApiById);
 
-export default router;
+export default BOOK_ROUTES;

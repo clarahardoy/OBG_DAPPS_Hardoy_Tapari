@@ -1,18 +1,26 @@
 import Joi from "joi";
 
 export const addReadingSchema = Joi.object({
-    book: Joi.string().required().messages({
+    shelfId: Joi.string().required().messages({
+        "string.base": "Debe ser un texto.",
+        "string.empty": "El campo de Estante no puede estar vacío.",
+        "any.required": "El Estante es obligatorio."
+    }),
+    bookId: Joi.string().required().messages({
         "string.base": "Debe ser un texto.",
         "string.empty": "El campo de Libro no puede estar vacío.",
         "any.required": "El Libro es obligatorio."
     }),
-    status: Joi.string().valid('FINISHED', 'ABANDONED', 'CURRENTLY_READING', 'WANT_TO_READ').required().messages({
-        "string.base": "Debe ser un texto.",
-        "string.empty": "El campo de Estado no puede estar vacío.",
-        "any.only": "El estado debe ser una de las siguientes opciones: FINISHED, ABANDONED, CURRENTLY_READING, WANT_TO_READ.",
-        "any.required": "El Estado es obligatorio."
-    }),
-    startedReainding: Joi.date().optional().messages({
+    status: Joi.string()
+        .valid('FINISHED', 'ABANDONED', 'CURRENTLY_READING', 'WANT_TO_READ')
+        .required()
+        .messages({
+            "string.base": "Debe ser un texto.",
+            "string.empty": "El campo de Estado no puede estar vacío.",
+            "any.only": "El estado debe ser FINISHED, ABANDONED, CURRENTLY_READING o WANT_TO_READ.",
+            "any.required": "El Estado es obligatorio."
+        }),
+    startedReading: Joi.date().optional().messages({
         "date.base": "Debe ser una fecha válida.",
     }),
     finishedReading: Joi.date().optional().messages({
@@ -23,14 +31,39 @@ export const addReadingSchema = Joi.object({
         "number.min": "El conteo de páginas debe ser al menos 1.",
         "any.required": "El Conteo de Páginas es obligatorio."
     }),
-    currentPage: Joi.number().min(1).optional().messages({
+    currentPage: Joi.number().min(0).optional().messages({
         "number.base": "Debe ser un número.",
-        "number.min": "La página actual no puede ser negativa.",
-        "any.required": "La Página Actual es obligatoria."
+        "number.min": "La página actual no puede ser negativa."
     }),
-});
-
+})
+    // regla condicional: si vienen ambos, currentPage <= pageCount
+    .custom((value, helpers) => {
+        if (value.currentPage !== undefined && value.pageCount !== undefined) {
+            if (value.currentPage > value.pageCount) {
+                return helpers.error("any.invalid");
+            }
+        }
+        return value;
+    }, "currentPage <= pageCount")
+    .messages({
+        "any.invalid": "La página actual no puede superar el total de páginas."
+    });
 
 export const updateReadingSchema = Joi.object({
-// Acá me perdí, no sé si es necesario que todos los campos sean opcionales o no
-});
+    status: Joi.string().valid('FINISHED', 'ABANDONED', 'CURRENTLY_READING', 'WANT_TO_READ'),
+    startedReading: Joi.date(),
+    finishedReading: Joi.date(),
+    pageCount: Joi.number().min(1),
+    currentPage: Joi.number().min(0)
+}).min(1) // al menos un campo debe estar presente
+    .custom((value, helpers) => {
+        if (value.currentPage !== undefined && value.pageCount !== undefined) {
+            if (value.currentPage > value.pageCount) {
+                return helpers.error("any.invalid");
+            }
+        }
+        return value;
+    }, "currentPage <= pageCount")
+    .messages({
+        "any.invalid": "La página actual no puede superar el total de páginas."
+    });

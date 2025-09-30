@@ -67,28 +67,28 @@ export const ShelfService = {
     },
 
     shelfHasSpaceLeft: async (shelfId, userId) => {
-       try {
-        const user = await UserService.getUserById(userId);
-        if (!user) {
-            throw new Error('Usuario no encontrado', { status: 404 });
-        }
-        const amountOfReadingsNow = await ReadingService.countReadingsByShelfId(shelfId);
-        if (amountOfReadingsNow >= user.getAllowedReadingsMax()) {
-            throw new Error(`Límite de ${allowedMax} libros alcanzado para el plan actual`);
-        }
-       } catch (error) {
-            throw error; 
+        try {
+            const user = await UserService.getUserById(userId);
+            if (!user) {
+                throw new Error('Usuario no encontrado', { status: 404 });
+            }
+            const amountOfReadingsNow = await ReadingService.countReadingsByShelfId(shelfId);
+            if (amountOfReadingsNow >= user.getAllowedReadingsMax()) {
+                throw new Error(`Límite de ${allowedMax} libros alcanzado para el plan actual`);
+            }
+        } catch (error) {
+            throw error;
         }
         return true;
     },
 
     canCreateMoreThanOneShelf: async (userId) => {
         try {
-        const user = await UserService.getUserById(userId);
-        if (!user) {
-            throw new Error('Usuario no encontrado', { status: 404 });
-        }
-        return user.getMembershipType() === MembershipType.PREMIUM;
+            const user = await UserService.getUserById(userId);
+            if (!user) {
+                throw new Error('Usuario no encontrado', { status: 404 });
+            }
+            return user.getMembershipType() === MembershipType.PREMIUM;
         } catch (error) {
             throw new Error(`Error al validar: ${error.message}`);
         }

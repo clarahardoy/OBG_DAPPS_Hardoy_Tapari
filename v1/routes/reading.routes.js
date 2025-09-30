@@ -3,20 +3,22 @@ import {
     createReadingController,
     getAllReadingsController,
     getReadingByIdController,
-    updateReadingByIdController
+    updateReadingByIdController,
+    deleteReadingByIdController
 } from '../controllers/reading.controller.js';
 import { validateBody }
     from '../middlewares/validate-body.middleware.js';
 import { validateObjectIdMiddleware }
     from '../middlewares/validate-object-id.middleware.js';
-import { addReadingSchema }
+import { addReadingSchema, updateReadingSchema }
     from '../validators/reading.validators.js';
 
-const router = express.Router({ mergeParams: true });
+const READING_ROUTES = express.Router({ mergeParams: true });
 
-router.post('/', validateBody(addReadingSchema), createReadingController);
-router.get('/', getAllReadingsController);
-router.get('/:id', validateObjectIdMiddleware, getReadingByIdController);
-router.patch('/:id', validateObjectIdMiddleware, updateReadingByIdController);
+READING_ROUTES.post('/', validateBody(addReadingSchema), createReadingController);
+READING_ROUTES.get('/', getAllReadingsController);
+READING_ROUTES.get('/:id', validateObjectIdMiddleware, getReadingByIdController);
+READING_ROUTES.patch('/:id', validateObjectIdMiddleware, validateBody(updateReadingSchema), updateReadingByIdController);
+READING_ROUTES.delete('/:id', validateObjectIdMiddleware, deleteReadingByIdController);
 
-export default router;
+export default READING_ROUTES;

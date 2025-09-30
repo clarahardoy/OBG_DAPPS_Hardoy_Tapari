@@ -2,7 +2,8 @@ import {
     createReadingService,
     getAllReadingsService,
     getReadingByIdService,
-    updateReadingByIdService
+    updateReadingByIdService,
+    deleteReadingByIdService
 } from '../services/reading.service.js';
 
 export const createReadingController = async (req, res) => {
@@ -39,10 +40,18 @@ export const updateReadingByIdController = async (req, res) => {
         const { id } = req.params;
         const updateData = req.body;
         const updatedReading = await updateReadingByIdService(id, updateData);
-        res.status(200).json({ message: "Lecutra actualizada con éxito", updatedReading });
+        res.status(200).json({ message: "Lectura actualizada con éxito", updatedReading });
     } catch (error) {
         res.status(500).json({ message: "Error al actualizar la lectura", error: error.message });
     };
 };
 
-// Eliminar lectura por id - pendiente deleteReadingByIdController
+export const deleteReadingByIdController = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedReading = await deleteReadingByIdService(id);
+        res.status(200).json({ message: "Lectura eliminada con éxito", deletedReading });
+    } catch (error) {
+        res.status(error.status || 500).json({ message: "Error al eliminar la lectura", error: error.message });
+    };
+};

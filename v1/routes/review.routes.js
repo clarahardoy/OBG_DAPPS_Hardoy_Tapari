@@ -12,11 +12,11 @@ import { validateObjectIdMiddleware }
 import { addReviewSchema }
     from '../validators/review.validators.js';
 
-const router = express.Router({ mergeParams: true });
+const REVIEW_ROUTES = express.Router({ mergeParams: true });
 
-router.post('/', validateBody(addReviewSchema), createReviewController);
-router.get('/', getAllReviewsController);
-router.get('/:id', validateObjectIdMiddleware, getReviewByIdController);
-router.delete('/:id', validateObjectIdMiddleware, deleteReviewByIdController);
+REVIEW_ROUTES.post('/', validateBody(addReviewSchema), createReviewController);
+REVIEW_ROUTES.get('/', getAllReviewsController);
+REVIEW_ROUTES.get('/:id', validateObjectIdMiddleware, getReviewByIdController);
+REVIEW_ROUTES.delete('/:id', validateObjectIdMiddleware, deleteReviewByIdController);
 
-export default router;
+export default REVIEW_ROUTES;

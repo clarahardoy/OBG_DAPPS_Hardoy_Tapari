@@ -14,7 +14,7 @@ export const registerService = async ({ email, password, name, surname, role }) 
     await user.save();
     const token = sign(user);
     return token;
-}
+};
 
 export const loginService = async ({ email, password }) => {
     const user = await User.findOne({ email });
@@ -25,5 +25,4 @@ export const loginService = async ({ email, password }) => {
     }
     const token = sign(user);
     return token;
-}
-
+};

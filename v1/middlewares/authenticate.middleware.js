@@ -9,11 +9,11 @@ export const authenticateMiddleware = (req, res, next) => {
   if (!token) {
     return res.status(401).json({ message: "Sin token", error: "No autorizado" });
   }
- jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-  if (err) {
-    return res.status(403).json({ message: "Token inválido", error: "Acceso denegado" });
-  }
-  req.email = user.email;
-  next();
- });
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: "Token inválido", error: "Acceso denegado" });
+    }
+    req.email = user.email;
+    next();
+  });
 };

@@ -3,7 +3,7 @@ const { Schema, model } = mongoose;
 
 const reviewSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    readingId: { type: Schema.Types.ObjectId, ref: 'Reading', required: true },
+    reading: { type: Schema.Types.ObjectId, ref: 'Reading', required: true },
     rating: { type: Number, min: 0, max: 5, required: true },
     comment: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },

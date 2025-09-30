@@ -2,28 +2,9 @@ import {
     createReviewService,
     getAllReviewsService,
     getReviewByIdService,
+    updateDatesOfReview,
     deleteReviewByIdService
 } from "../services/review.service.js";
-
-/*ENDPOINTS:
-    createReview(readingId, reviewData, userId): 
-        - validar que la reading esté terminada (status)
-        - validar que no exista una review para esa reading
-        - crear la review
-        - retornar la review
-
-    getAllReviews(): 
-        - obtener todas las reviews
-        - retornar las reviews
-
-    getReviewById(id): 
-        - obtener la review por id
-        - retornar la review
-
-    deleteReviewById(id): 
-        - eliminar la review por id
-        - retornar la review eliminada
-*/
 
 export const createReviewController = async (req, res) => {
     try {
@@ -54,7 +35,15 @@ export const getReviewByIdController = async (req, res) => {
     }
 };
 
-// updateReviewByIdController pending
+export const updateDatesOfReviewController = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updated = await updateDatesOfReview(id);
+        res.status(200).json({ message: "Fechas sincronizadas con éxito", review: updated });
+    } catch (error) {
+        res.status(error.status || 500).json({ message: "Error al sincronizar fechas", error: error.message });
+    };
+};
 
 export const deleteReviewByIdController = async (req, res) => {
     try {

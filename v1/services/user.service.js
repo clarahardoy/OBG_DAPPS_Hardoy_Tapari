@@ -7,8 +7,8 @@ export const UserService = {
             throw new Error('Usuario no encontrado');
         }
         return user;
-        
-},
+
+    },
 
     getUsers: async () => {
         const users = await User.find().populate('shelf').populate('membership');
@@ -16,7 +16,7 @@ export const UserService = {
             throw new Error('Usuarios no encontrados');
         }
         return users;
-},
+    },
 
     updateUser: async (id, user) => {
         const updatedUser = await User.findByIdAndUpdate(id, user, { new: true });
@@ -24,7 +24,7 @@ export const UserService = {
             throw new Error('Usuario no encontrado');
         }
         return updatedUser;
-},
+    },
 
     deleteUser: async (id) => {
         const deleted = await User.findByIdAndDelete(id);
@@ -32,5 +32,5 @@ export const UserService = {
             throw new Error('Usuario no encontrado');
         }
         return { message: "Usuario eliminado OK", deleted };
-}
-}
+    }
+};
