@@ -1,10 +1,5 @@
 import express from 'express';
-import {
-    createReviewController,
-    getAllReviewsController,
-    getReviewByIdController,
-    deleteReviewByIdController
-} from '../controllers/review.controller.js';
+import { ReviewController } from '../controllers/review.controller.js';
 import { validateBody }
     from '../middlewares/validate-body.middleware.js';
 import { validateObjectIdMiddleware }
@@ -14,9 +9,9 @@ import { addReviewSchema }
 
 const REVIEW_ROUTES = express.Router({ mergeParams: true });
 
-REVIEW_ROUTES.post('/', validateBody(addReviewSchema), createReviewController);
-REVIEW_ROUTES.get('/', getAllReviewsController);
-REVIEW_ROUTES.get('/:id', validateObjectIdMiddleware, getReviewByIdController);
-REVIEW_ROUTES.delete('/:id', validateObjectIdMiddleware, deleteReviewByIdController);
+REVIEW_ROUTES.post('/', validateBody(addReviewSchema), ReviewController.createReview);
+REVIEW_ROUTES.get('/', ReviewController.getAllReviews);
+REVIEW_ROUTES.get('/:id', validateObjectIdMiddleware, ReviewController.getReviewById);
+REVIEW_ROUTES.delete('/:id', validateObjectIdMiddleware, ReviewController.deleteReviewById);
 
 export default REVIEW_ROUTES;

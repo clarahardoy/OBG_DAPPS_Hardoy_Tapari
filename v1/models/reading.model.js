@@ -1,10 +1,12 @@
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
+import { ReadingStatus } from './enums/reading-status.enum.js';
+
 const readingSchema = new Schema({
-    shelfId: { type: Schema.Types.ObjectId, ref: 'Shelf', required: true },
-    bookId: { type: Schema.Types.ObjectId, ref: 'Book', required: true },
-    status: { type: String, enum: ['FINISHED', 'ABANDONED', 'CURRENTLY_READING', 'WANT_TO_READ'], required: true },
+    shelfId: { type: Schema.Types.ObjectId, ref: 'Shelf', required: true, index: true },
+    bookId: { type: Schema.Types.ObjectId, ref: 'Book', required: true, index: true },
+    status: { type: String, enum: Object.values(ReadingStatus), required: true },
     startedReading: { type: Date },
     finishedReading: { type: Date },
     pageCount: { type: Number, required: true },

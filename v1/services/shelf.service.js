@@ -93,4 +93,25 @@ export const ShelfService = {
             throw new Error(`Error al validar: ${error.message}`);
         }
     },
+
+    getUserShelves: async (userId) => {
+        try {
+            if (!userId) {
+                throw new Error('User ID requerido');
+            }
+            const shelves = await Shelf.find({ userId });
+            return shelves;
+        } catch (error) {
+            throw new Error(`Error al obtener las shelves: ${error.message}`);
+        }
+    },
+
+    getUserShelvesIds: async (userId) => {
+        try {
+            const shelves = await ShelfService.getUserShelves(userId);
+            return shelves.map(s => s._id);
+        } catch (error) {
+            throw new Error(`Error al obtener los IDs de las shelves: ${error.message}`);
+        }
+    },
 };  

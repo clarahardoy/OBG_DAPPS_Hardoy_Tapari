@@ -4,7 +4,7 @@ export const AuthController = {
   login: async (req, res) => {
     try {
       const token = await loginService(req.body);
-      return res.status(200).json({ token, message: "Usuario iniciado sesión correctamente", token });
+      return res.status(200).json({ token, message: "Usuario iniciado sesión correctamente" });
     } catch (error) {
       return res.status(500).json({ message: "Error al iniciar sesión", error: error.message });
     }

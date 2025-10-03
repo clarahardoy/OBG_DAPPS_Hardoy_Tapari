@@ -1,5 +1,6 @@
 // Middleware para setear las fechas de lectura según el status
 // Usado en create y update de Reading (con doc o con objeto de update)
+import { ReadingStatus } from '../models/enums/reading-status.enum.js';
 
 export const setReadingDateMiddleware = (readingDocOrUpdate) => {
     const r = readingDocOrUpdate;
@@ -32,26 +33,26 @@ export const setReadingDateMiddleware = (readingDocOrUpdate) => {
     };
 
     // Lógica según el status
-    if (status === 'CURRENTLY_READING') {
+    if (status === ReadingStatus.CURRENTLY_READING) {
         // Empieza a leer: aseguramos fecha de inicio
         setIfUnset('startedReading');
         // No tocar finishedReading si no corresponde
     };
 
-    if (status === 'FINISHED') {
+    if (status === ReadingStatus.FINISHED) {
         // Aseguramos que ambas fechas estén puestas
         setIfUnset('startedReading');
         setIfUnset('finishedReading');
     };
 
-    if (status === 'WANT_TO_READ') {
+    if (status === ReadingStatus.WANT_TO_READ) {
         // Todavía no empezó: limpiamos ambas fechas
         if (!r.$unset) r.$unset = {};
         unset('startedReading');
         unset('finishedReading');
     };
 
-    if (status === 'ABANDONED') {
+    if (status === ReadingStatus.ABANDONED) {
         // Abandonó: mantenemos started, limpiamos finished
         ensureUnsetBag();
         unset('finishedReading');
