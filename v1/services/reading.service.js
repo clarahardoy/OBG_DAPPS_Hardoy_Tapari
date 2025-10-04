@@ -1,10 +1,7 @@
 import Reading from "../models/reading.model.js";
-import User from "../models/user.model.js";
-import Book from "../models/book.model.js";
 import { setReadingDateMiddleware } from "../middlewares/setReadingDate.middleware.js";
 import { ShelfService } from "./shelf.service.js";
 import { UserService } from "./user.service.js";
-import { ReadingService } from "./reading.service.js";
 
 // Agreagr una nueva lectura POST
 
@@ -133,5 +130,9 @@ export const ReadingService = {
             throw err;
         };
         return deleted;
+    },
+
+    countReadingsByShelfId: async (shelfId) => {
+        return await Reading.countDocuments({ shelfId });
     },
 }
