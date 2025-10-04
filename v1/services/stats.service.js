@@ -10,8 +10,7 @@
 import { buildRange } from "../utils/build-range.js";
 import { ShelfService } from "./shelf.service.js";
 import { Reading } from "../models/reading.model.js";
-import { Book } from "../models/book.model.js";
-
+import Book from "../models/book.model.js";
 export const StatsService = {
 
     // LIBROS LEÍDOS EN 1 AÑO:
