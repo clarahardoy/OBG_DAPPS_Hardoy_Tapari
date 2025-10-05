@@ -39,11 +39,15 @@ export const ShelfController = {
             const userId = req.user.id;
             const { shelfName } = req.body;
 
-            const canCreateMultiple = await ShelfService.canCreateMoreThanOneShelf(userId);
-            if (!canCreateMultiple) {
+            //Validar que el usuario tenga 0 shelf y si tiene, no se puede crear otra
+            const shelves = await ShelfService.getUserShelves(userId);
+            if (shelves.length >= 1) {
+              const canCreateMultiple = await ShelfService.canCreateMoreThanOneShelf(userId);
+              if (!canCreateMultiple) {
                 return res.status(403).json({
                     error: "Plan no válido para crear más de una shelf"
                 });
+              }
             }
 
             const shelfData = {
