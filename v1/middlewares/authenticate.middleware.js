@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../models/user.model.js'; // ajusta el path si aplica
+import User  from '../models/user.model.js'; // ajusta el path si aplica
 
 export const authenticateMiddleware = (req, res, next) => {
   const authHeaders = req.headers.authorization;

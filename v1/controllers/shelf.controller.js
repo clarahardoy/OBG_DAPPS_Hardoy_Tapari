@@ -72,7 +72,7 @@ export const ShelfController = {
             const book = await BookService.findOrCreateBook(googleBooksId);
 
             const readingData = {
-                id: id,
+                shelfId: id,
                 bookId: book._id,
                 status
             };
