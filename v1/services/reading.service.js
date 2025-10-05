@@ -1,5 +1,5 @@
 import Reading from "../models/reading.model.js";
-import { setReadingDateMiddleware } from "../middlewares/setReadingDate.middleware.js";
+import { setReadingDateMiddleware } from "../middlewares/set-reading-date.middleware.js";
 import { ShelfService } from "./shelf.service.js";
 import { UserService } from "./user.service.js";
 

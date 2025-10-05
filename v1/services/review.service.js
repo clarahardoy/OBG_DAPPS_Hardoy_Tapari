@@ -1,5 +1,5 @@
 import Review from "../models/review.model.js";
-import { setReadingDateMiddleware } from "../middlewares/setReadingDate.middleware.js";
+import { setReadingDateMiddleware } from "../middlewares/set-reading-date.middleware.js";
 import { ReadingService } from "./reading.service.js";
 
 export const ReviewService = {
