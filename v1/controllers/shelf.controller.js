@@ -149,4 +149,12 @@ export const ShelfController = {
         const hasSpaceLeft = await ShelfService.shelfHasSpaceLeft(id, userId);
         res.status(200).json({ message: "Shelf tiene espacio libre", hasSpaceLeft });
     },
+
+    validateShelfBelongsToUser: async (req, res) => {
+        const { id } = req.params;
+        const shelfId = id;
+        const userId = req.user.id;
+        const belongsToUser = await ShelfService.validateShelfBelongsToUser(shelfId, userId);
+        res.status(200).json({ message: "Shelf pertenece al usuario", belongsToUser });
+    },
 };

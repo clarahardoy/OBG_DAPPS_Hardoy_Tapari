@@ -18,4 +18,7 @@ userSchema.methods.getAllowedReadingsMax = function() {
     return this.membership?.bookMax || 0;
 };
 
+userSchema.methods.getMembershipType = function() {
+    return this.membership?.name;
+};
 export default mongoose.model('User', userSchema);

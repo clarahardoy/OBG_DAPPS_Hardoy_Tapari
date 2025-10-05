@@ -114,4 +114,12 @@ export const ShelfService = {
             throw new Error(`Error al obtener los IDs de las shelves: ${error.message}`);
         }
     },
+
+    validateShelfBelongsToUser: async (shelfId, userId) => {
+        const shelf = await ShelfService.findShelfById(shelfId);
+        if (shelf.userId !== userId) {
+            throw new Error('Shelf no pertenece al usuario', { status: 403 });
+        }
+        return true;
+    },
 };  
