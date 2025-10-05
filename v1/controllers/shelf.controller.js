@@ -6,15 +6,15 @@ export const ShelfController = {
 
     getReadingsInShelf: async (req, res) => {
         try {
-            const { shelfId } = req.params;
+            const { id } = req.params;
             const userId = req.user.id;
 
-            await ShelfService.validateShelfBelongsToUser(shelfId, userId);
+            await ShelfService.validateShelfBelongsToUser(id, userId);
 
-            const readings = await ShelfService.getReadingsInShelf(shelfId);
-            res.status(200).json({ 
-                message: "Lecturas cargadas con éxito", 
-                readings 
+            const readings = await ShelfService.getReadingsInShelf(id);
+            res.status(200).json({
+                message: "Lecturas cargadas con éxito",
+                readings
             });
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -25,9 +25,9 @@ export const ShelfController = {
         try {
             const userId = req.user.id;
             const shelves = await ShelfService.getUserShelves(userId);
-            res.status(200).json({ 
-                message: "Shelves cargadas con éxito", 
-                shelves 
+            res.status(200).json({
+                message: "Shelves cargadas con éxito",
+                shelves
             });
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -41,8 +41,8 @@ export const ShelfController = {
 
             const canCreateMultiple = await ShelfService.canCreateMoreThanOneShelf(userId);
             if (!canCreateMultiple) {
-                return res.status(403).json({ 
-                    error: "Plan no válido para crear más de una shelf" 
+                return res.status(403).json({
+                    error: "Plan no válido para crear más de una shelf"
                 });
             }
 
@@ -53,9 +53,9 @@ export const ShelfController = {
             };
 
             const newShelf = await ShelfService.createShelf(shelfData);
-            res.status(201).json({ 
-                message: "Shelf creada con éxito", 
-                shelf: newShelf 
+            res.status(201).json({
+                message: "Shelf creada con éxito",
+                shelf: newShelf
             });
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -64,24 +64,24 @@ export const ShelfController = {
 
     addReadingToShelf: async (req, res) => {
         try {
-            const { shelfId, googleBooksId, status = 'WANT_TO_READ' } = req.body;
+            const { id, googleBooksId, status = 'WANT_TO_READ' } = req.body;
             const userId = req.user.id;
 
-            await ShelfService.validateShelfBelongsToUser(shelfId, userId);
-            await ShelfService.validateShelfHasSpaceLeft(shelfId, userId);
+            await ShelfService.validateShelfBelongsToUser(id, userId);
+            await ShelfService.validateShelfHasSpaceLeft(id, userId);
             const book = await BookService.findOrCreateBook(googleBooksId);
 
             const readingData = {
-                shelfId,
+                id: id,
                 bookId: book._id,
                 status
             };
 
             const newReading = await ReadingService.createReading(readingData);
-            
-            res.status(201).json({ 
-                message: "Lectura agregada con éxito", 
-                reading: newReading 
+
+            res.status(201).json({
+                message: "Lectura agregada con éxito",
+                reading: newReading
             });
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -97,7 +97,7 @@ export const ShelfController = {
             if (!reading) {
                 return res.status(404).json({ error: "Lectura no encontrada" });
             }
-            await ShelfService.validateShelfBelongsToUser(reading.shelfId, userId);
+            await ShelfService.validateShelfBelongsToUser(reading.id, userId);
             await ReadingService.deleteReading(readingId);
             res.status(200).json({ message: "Lectura eliminada con éxito" });
         } catch (error) {
@@ -107,16 +107,16 @@ export const ShelfController = {
 
     updateShelf: async (req, res) => {
         try {
-            const { shelfId } = req.params;
+            const { id } = req.params;
             const userId = req.user.id;
             const updateData = req.body;
 
-            await ShelfService.validateShelfBelongsToUser(shelfId, userId);
-            const updatedShelf = await ShelfService.updateShelf(shelfId, updateData);
-            
-            res.status(200).json({ 
-                message: "Shelf actualizada con éxito", 
-                shelf: updatedShelf 
+            await ShelfService.validateShelfBelongsToUser(id, userId);
+            const updatedShelf = await ShelfService.updateShelf(id, updateData);
+
+            res.status(200).json({
+                message: "Shelf actualizada con éxito",
+                shelf: updatedShelf
             });
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -125,18 +125,18 @@ export const ShelfController = {
 
     deleteShelf: async (req, res) => {
         try {
-            const { shelfId } = req.params;
+            const { id } = req.params;
             const userId = req.user.id;
 
-            const shelf = await ShelfService.validateShelfBelongsToUser(shelfId, userId);
+            const shelf = await ShelfService.validateShelfBelongsToUser(id, userId);
 
             if (shelf.isDefault) {
-                return res.status(400).json({ 
-                    error: "No se puede eliminar la biblioteca principal" 
+                return res.status(400).json({
+                    error: "No se puede eliminar la biblioteca principal"
                 });
             }
 
-            await ShelfService.deleteShelf(shelfId);
+            await ShelfService.deleteShelf(id);
             res.status(200).json({ message: "Shelf eliminada con éxito" });
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -144,9 +144,9 @@ export const ShelfController = {
     },
 
     validateShelfHasSpaceLeft: async (req, res) => {
-        const { shelfId } = req.params;
+        const { id } = req.params;
         const { userId } = req.params;
-        const hasSpaceLeft = await ShelfService.shelfHasSpaceLeft(shelfId, userId);
+        const hasSpaceLeft = await ShelfService.shelfHasSpaceLeft(id, userId);
         res.status(200).json({ message: "Shelf tiene espacio libre", hasSpaceLeft });
     },
 };
