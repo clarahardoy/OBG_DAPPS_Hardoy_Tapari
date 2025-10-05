@@ -19,7 +19,7 @@ export const ReviewService = {
     
     createReview: async (reviewData) => {
         const { reading: readingId, userId } = reviewData;
-        await this.validateStatusIsOk(readingId);
+        await ReviewService.validateStatusIsOk(readingId);
     
         //Evitar duplicados: una review por usuario y Reading
         const duplicado = await Review.findOne({ reading: readingId, userId });
@@ -71,9 +71,9 @@ export const ReviewService = {
     },
     
     updateDatesOfReview: async (reviewId) => {
-        const {review, reading} = await this.getReviewById(reviewId);
+        const {review, reading} = await ReviewService.getReviewById(reviewId);
     
-       await this.validateStatusIsOk(reading._id || reading);
+       await ReviewService.validateStatusIsOk(reading._id || reading);
     
         // Sincronizar las fechas en Reading y las guarda
         setReadingDateMiddleware(reading);
@@ -83,11 +83,11 @@ export const ReviewService = {
         review.updatedAt = new Date();
         await review.save();
     
-        return await this.getReviewById(reviewId)
+        return await ReviewService.getReviewById(reviewId)
      },
     
     deleteReviewById: async (id) => {
-        const deletedReview = await this.getReviewById(id);
+        const deletedReview = await ReviewService.getReviewById(id);
         await Review.findByIdAndDelete(id);
         if (!deletedReview) {
             const err = new Error('No se encontró la reseña a eliminar');

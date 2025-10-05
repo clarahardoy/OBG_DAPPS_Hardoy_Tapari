@@ -46,7 +46,7 @@ export const BookService = {
       throw new Error('At least one search parameter is required', { status: 400 });
     }
 
-    return this.getBooksFromApi(search.trim());
+    return BookService.getBooksFromApi(search.trim());
   },
 
   getBookFromApiById: async (googleBooksId) => {
@@ -78,11 +78,11 @@ export const BookService = {
 
   findOrCreateBook: async (googleBooksId) => {
     try {
-      const book = await this.findBookByGoogleBooksId(googleBooksId);
+      const book = await BookService.findBookByGoogleBooksId(googleBooksId);
       if (!book) {
         // si no existe, buscar de google books y crearlo en la
-        const googleBookData = await this.getBookFromApiById(googleBooksId);
-        book = await this.createBook(googleBookData);
+        const googleBookData = await BookService.getBookFromApiById(googleBooksId);
+        book = await BookService.createBook(googleBookData);
       }
       return book;
     } catch (error) {
