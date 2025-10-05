@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import User  from '../models/user.model.js'; // ajusta el path si aplica
+import User from '../models/user.model.js'; // ajusta el path si aplica
 
 export const authenticateMiddleware = (req, res, next) => {
   const authHeaders = req.headers.authorization;
@@ -18,7 +18,7 @@ export const authenticateMiddleware = (req, res, next) => {
     });
   };
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(403).json({
         message: "Token inválido",
@@ -27,7 +27,7 @@ export const authenticateMiddleware = (req, res, next) => {
     };
 
     // El token actual solo trae { id }. Si no está, es inválido.
-    const userId = payload && payload.id;
+    const userId = decoded && decoded.id;
     if (!userId) {
       return res.status(403).json({
         message: "Token inválido",
@@ -35,8 +35,7 @@ export const authenticateMiddleware = (req, res, next) => {
       });
     };
 
-    // Enriquecemos la request consultando a la BD (sin cambiar el token):
-    // cargamos email y role para que otras capas (Stats, authorize) funcionen.
+    // Enriquecemos la request consultando a la BD (sin cambiar el token)
     User.findById(userId).select('_id email role name surname')
       .then((user) => {
         if (!user) {
