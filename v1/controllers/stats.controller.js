@@ -8,7 +8,7 @@ export const StatsController = {
             const year = req.query.year ? Number(req.query.year) : undefined;
             const month = req.query.month ? Number(req.query.month) : undefined;
 
-            if (!validateMonthYear(month, year)) {
+            if(!validateMonthYear(month, year)) {
                 return res.status(400).json({ message: 'Mes o año inválidos' });
             }
     
