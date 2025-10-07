@@ -1,4 +1,3 @@
-
 import express from 'express';
 import { UserController } from '../controllers/user.controller.js';
 import { validateObjectIdMiddleware } from '../middlewares/validate-object-id.middleware.js';

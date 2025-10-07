@@ -10,8 +10,10 @@ export const ShelfService = {
             const newShelf = await Shelf.create(shelfData);
             return newShelf;
         } catch (error) {
-            throw new Error('Error al crear la shelf', error, { status: 400 })
-        }
+            const e = new Error(error?.message || 'Error al crear la shelf');
+            e.status = 400;
+            throw e;
+        };
     },
 
     updateShelf: async (shelfId, shelfData) => {
@@ -73,7 +75,8 @@ export const ShelfService = {
                 throw new Error('Usuario no encontrado', { status: 404 });
             }
             const amountOfReadingsNow = await ReadingService.countReadingsByShelfId(shelfId);
-            if (amountOfReadingsNow >= user.getAllowedReadingsMax()) {
+            const allowedMax = user.getAllowedReadingsMax()
+            if ((Number.isFinite(allowedMax)) && (amountOfReadingsNow >= allowedMax)) {
                 throw new Error(`Límite de ${allowedMax} libros alcanzado para el plan actual`);
             }
         } catch (error) {
@@ -117,7 +120,7 @@ export const ShelfService = {
 
     validateShelfBelongsToUser: async (shelfId, userId) => {
         const shelf = await ShelfService.findShelfById(shelfId);
-        if (shelf.userId !== userId) {
+        if (!shelf.userId?.equals?.(userId)) {
             throw new Error('Shelf no pertenece al usuario', { status: 403 });
         }
         return true;

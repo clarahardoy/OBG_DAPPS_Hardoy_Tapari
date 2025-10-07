@@ -112,7 +112,4 @@ export const StatsService = {
             mostReadGenre: topGenre
         };
     }
-}
-
-
-
+};

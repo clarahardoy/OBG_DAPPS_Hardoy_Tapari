@@ -37,22 +37,22 @@ export const ShelfController = {
     createShelf: async (req, res) => {
         try {
             const userId = req.user.id;
-            const { shelfName } = req.body;
+            const { name } = req.body;
 
             //Validar que el usuario tenga 0 shelf y si tiene, no se puede crear otra
             const shelves = await ShelfService.getUserShelves(userId);
             if (shelves.length >= 1) {
-              const canCreateMultiple = await ShelfService.canCreateMoreThanOneShelf(userId);
-              if (!canCreateMultiple) {
-                return res.status(403).json({
-                    error: "Plan no válido para crear más de una shelf"
-                });
-              }
+                const canCreateMultiple = await ShelfService.canCreateMoreThanOneShelf(userId);
+                if (!canCreateMultiple) {
+                    return res.status(403).json({
+                        error: "Plan no válido para crear más de una shelf"
+                    });
+                }
             }
 
             const shelfData = {
                 userId,
-                name: shelfName,
+                name: name,
                 isDefault: false,
                 readings: []
             };
@@ -73,13 +73,15 @@ export const ShelfController = {
             const userId = req.user.id;
 
             await ShelfService.validateShelfBelongsToUser(id, userId);
-            await ShelfService.validateShelfHasSpaceLeft(id, userId);
+            await ShelfService.shelfHasSpaceLeft(id, userId);
             const book = await BookService.findOrCreateBook(googleBooksId);
 
             const readingData = {
                 shelfId: id,
                 bookId: book._id,
-                status
+                status,
+                pageCount: book.pages,
+                currentPage: status === 'FINISHED' ? book.pages : 0,
             };
 
             const newReading = await ReadingService.createReading(readingData);
@@ -102,8 +104,8 @@ export const ShelfController = {
             if (!reading) {
                 return res.status(404).json({ error: "Lectura no encontrada" });
             }
-            await ShelfService.validateShelfBelongsToUser(reading.id, userId);
-            await ReadingService.deleteReading(readingId);
+            await ShelfService.validateShelfBelongsToUser(reading.shelfId, userId);
+            await ReadingService.deleteReadingById(readingId);
             res.status(200).json({ message: "Lectura eliminada con éxito" });
         } catch (error) {
             res.status(400).json({ error: error.message });
