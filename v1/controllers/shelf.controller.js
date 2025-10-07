@@ -53,7 +53,8 @@ export const ShelfController = {
             const shelfData = {
                 userId,
                 name: shelfName,
-                isDefault: false
+                isDefault: false,
+                readings: []
             };
 
             const newShelf = await ShelfService.createShelf(shelfData);
