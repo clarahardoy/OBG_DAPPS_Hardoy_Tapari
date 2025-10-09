@@ -1,3 +1,5 @@
+import { ReadingStatus } from '../models/enums/reading-status.enum.js';
+
 export const setReadingDates = (reading) => {
     reading.updatedAt = new Date();
     

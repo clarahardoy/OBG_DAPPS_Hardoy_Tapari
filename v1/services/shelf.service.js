@@ -44,15 +44,18 @@ export const ShelfService = {
     findShelfById: async (shelfId) => {
         try {
             if (!shelfId) {
-                throw new Error('Shelf ID no encontrado', { status: 404 });
+                throw new Error('Shelf ID no encontrado');
             }
+            
             const shelf = await Shelf.findById(shelfId);
             if (!shelf) {
-                throw new Error('Shelf no encontrada');
+                throw new Error(`Shelf no encontrada con ID: ${shelfId}`);
             }
             return shelf;
         } catch (error) {
-            throw new Error('Error al encontrar la shelf', error, { status: 400 })
+            const err = new Error(`Error al encontrar la shelf: ${error.message}`);
+            err.status = 404;
+            throw err;
         }
     },
 
