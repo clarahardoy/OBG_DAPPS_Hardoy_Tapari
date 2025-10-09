@@ -71,12 +71,24 @@ export const ShelfController = {
     addReadingToShelf: async (req, res) => {
         try {
             console.log('Request body:', req.body);
+            const { shelfId, googleBooksId, status = ReadingStatus.WANT_TO_READ } = req.body;
+            const userId = req.user.id;
             const { shelfId, googleBooksId, status } = req.body;
             const userId = req.userId;
 
+            console.log('Validating shelf belongs to user...');
+            await ShelfService.validateShelfBelongsToUser(shelfId, userId);
+            console.log('Shelf validation passed');
+
+            console.log('Checking shelf space...');
+            await ShelfService.shelfHasSpaceLeft(shelfId, userId);
+            console.log('Shelf space check passed');
+
+            console.log('Finding/creating book...');
             await ShelfService.validateShelfBelongsToUser(shelfId, userId);
             await ShelfService.shelfHasSpaceLeft(shelfId, userId);
             const book = await BookService.findOrCreateBook(googleBooksId);
+            console.log('Book found/created:', { bookId: book._id, title: book.title, pages: book.pages });
 
             const readingData = {
                 shelfId: shelfId,
@@ -85,8 +97,11 @@ export const ShelfController = {
                 pageCount: book.pages,
                 currentPage: status === ReadingStatus.FINISHED ? book.pages : 0,
             };
+            console.log('Reading data to create:', readingData);
 
+            console.log('Creating reading...');
             const newReading = await ReadingService.createReading(readingData);
+            console.log('Reading created successfully');
 
             res.status(201).json({
                 message: "Lectura agregada con éxito",
