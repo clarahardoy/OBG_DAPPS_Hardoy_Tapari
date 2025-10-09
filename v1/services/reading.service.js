@@ -1,5 +1,5 @@
 import Reading from "../models/reading.model.js";
-import { setReadingDateMiddleware } from "../middlewares/set-reading-date.middleware.js";
+import { setReadingDates } from "../middlewares/set-reading-date.middleware.js";
 import { ShelfService } from "./shelf.service.js";
 import { UserService } from "./user.service.js";
 
@@ -17,7 +17,7 @@ export const ReadingService = {
                 if (limit !== null) {
                     const currentCount = await ReadingService.countReadingsByShelfId(shelf._id);
                     if (currentCount >= limit) {
-                        const err = new Error("Alcanzaste el límite. Si deseas subir más lecturas suscríbete al plan Premium.");
+                        const err = new Error("Se alcanzó el límite de lecturas.");
                         err.status = 403;
                         throw err;
                     };
@@ -25,13 +25,13 @@ export const ReadingService = {
 
                 const newReading = new Reading(readingData);
                 // Que se autocompleten las fechas según status
-                setReadingDateMiddleware(newReading);
+                setReadingDates(newReading);
                 await newReading.save();
                 return await Reading.findById(newReading._id)
                     .populate("bookId")
                     .populate("shelfId");
             } catch (error) {
-                let err = new Error('Error al agregar la lectura');
+                let err = new Error('Error al agregar la lectura', error.message);
                 err.status = 500;
                 throw err;
             };
@@ -81,7 +81,7 @@ export const ReadingService = {
         const update = { $set: { ...updateData } };
 
         // Aplica reglas de fechas/updatedAt según status/cambios
-        setReadingDateMiddleware(update);
+        setReadingDates(update);
 
         let updatedReading;
         try {

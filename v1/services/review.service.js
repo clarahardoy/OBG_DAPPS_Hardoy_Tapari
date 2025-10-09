@@ -1,5 +1,4 @@
 import Review from "../models/review.model.js";
-import { setReadingDateMiddleware } from "../middlewares/set-reading-date.middleware.js";
 import { ReadingService } from "./reading.service.js";
 
 export const ReviewService = {
@@ -76,7 +75,7 @@ export const ReviewService = {
        await ReviewService.validateStatusIsOk(reading._id || reading);
     
         // Sincronizar las fechas en Reading y las guarda
-        setReadingDateMiddleware(reading);
+        setReadingDates(reading);
         await ReadingService.updateReadingById(reading._id, reading);
     
         // Guardar la fecha de actualización en Review
