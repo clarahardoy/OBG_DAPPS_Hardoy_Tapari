@@ -10,19 +10,10 @@ export const ReadingService = {
     createReading: async (readingData) => {
             try {
 
-                //Regla de negocio: límite por membresía
-                // Plus -> máx 10 Readings
-                // Premium -> ilimitado 
-
                 const shelf = await ShelfService.findShelfById(readingData.shelfId);
                 const user = await UserService.getUserById(shelf.userId);
 
-                let limit = null;
-                const m = user.membership;
-                if (m?.name?.toLowerCase() === "plus") limit = 10;
-                if (m?.name?.toLowerCase() === "premium") limit = null;
-                if (typeof m?.bookMax === "number") limit = m.bookMax;
-
+                let limit = await user.getAllowedReadingsMax();
                 if (limit !== null) {
                     const currentCount = await ReadingService.countReadingsByShelfId(shelf._id);
                     if (currentCount >= limit) {
