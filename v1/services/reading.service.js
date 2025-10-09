@@ -83,10 +83,11 @@ export const ReadingService = {
     // Actualizar una lectura por ID PUT
     updateReadingById: async (id, updateData) => {
         const reading = await ReadingService.getReadingById(id);
-        const book = await BookService.getBookById(reading.googleBooksId);
-        const pageCount = book.pageCount;
-
+        const book = await BookService.findBookByGoogleBooksId(reading.googleBooksId);
+        const pageCount = book.pages;
+        
         if (!ReadingService.pageCountIsValid(updateData.currentPage, pageCount)) {
+
             const err = new Error('La página actual no puede ser mayor al total de páginas');
             err.status = 400;
             throw err;
