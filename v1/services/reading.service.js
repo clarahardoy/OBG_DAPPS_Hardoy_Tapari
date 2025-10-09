@@ -86,8 +86,6 @@ export const ReadingService = {
         const reading = await ReadingService.getReadingById(id);
         const book = await BookService.findBookByGoogleBooksId(reading.googleBooksId);
         const pageCount = book.pages;
-        console.log(pageCount);
-        console.log(updateData);
         if (updateData.status === ReadingStatus.FINISHED) {
             updateData.currentPage = pageCount;
         }

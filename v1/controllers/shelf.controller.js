@@ -18,7 +18,8 @@ export const ShelfController = {
                 readings
             });
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ error: error.message });
         }
     },
 
@@ -31,7 +32,8 @@ export const ShelfController = {
                 shelves
             });
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ error: error.message });
         }
     },
 
@@ -64,7 +66,8 @@ export const ShelfController = {
                 shelf: newShelf
             });
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ error: error.message });
         }
     },
 
@@ -75,7 +78,7 @@ export const ShelfController = {
 
             await ShelfService.validateShelfBelongsToUser(shelfId, userId);
             await ShelfService.shelfHasSpaceLeft(shelfId, userId);
-            
+
             const book = await BookService.findOrCreateBook(googleBooksId);
 
             const readingData = {
@@ -93,7 +96,8 @@ export const ShelfController = {
                 reading: newReading
             });
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ error: error.message });
         }
     },
 
@@ -110,7 +114,8 @@ export const ShelfController = {
             await ReadingService.deleteReadingById(readingId);
             res.status(200).json({ message: "Lectura eliminada con éxito" });
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ error: error.message });
         }
     },
 
@@ -128,7 +133,8 @@ export const ShelfController = {
                 shelf: updatedShelf
             });
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ error: error.message });
         }
     },
 
@@ -148,7 +154,8 @@ export const ShelfController = {
             await ShelfService.deleteShelf(id);
             res.status(200).json({ message: "Shelf eliminada con éxito" });
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ error: error.message });
         }
     },
 

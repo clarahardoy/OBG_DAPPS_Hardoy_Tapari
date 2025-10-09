@@ -8,7 +8,8 @@ export const ReadingController = {
             const newReading = await ReadingService.createReading(readingData);
             res.status(201).json({ message: "Lectura creada con éxito", newReading });
         } catch (error) {
-            res.status(500).json({ message: "Error al crear la lectura", error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ message: "Error al crear la lectura", error: error.message });
         };
     },
 
@@ -17,7 +18,8 @@ export const ReadingController = {
             const readings = await ReadingService.getAllReadings();
             res.status(200).json({ message: "Lecturas cargadas con éxito ", readings });
         } catch (error) {
-            res.status(500).json({ message: "Error al obtener las lecturas", error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ message: "Error al obtener las lecturas", error: error.message });
         };
     },
 
@@ -27,7 +29,8 @@ export const ReadingController = {
             const reading = await ReadingService.getReadingById(id);
             res.status(200).json({ message: "Lectura encontrada con éxito", reading });
         } catch (error) {
-            res.status(500).json({ message: "Error al obtener la lectura", error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ message: "Error al obtener la lectura", error: error.message });
         };
     },
 
@@ -39,7 +42,8 @@ export const ReadingController = {
             const updatedReading = await ReadingService.updateReadingById(id, updateData);
             res.status(200).json({ message: "Lectura actualizada con éxito", updatedReading });
         } catch (error) {
-            res.status(500).json({ message: "Error al actualizar la lectura", error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ message: "Error al actualizar la lectura", error: error.message });
         };
     },
 
@@ -49,7 +53,8 @@ export const ReadingController = {
             const deletedReading = await ReadingService.deleteReadingById(id);
             res.status(200).json({ message: "Lectura eliminada con éxito", deletedReading });
         } catch (error) {
-            res.status(500).json({ message: "Error al eliminar la lectura", error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ message: "Error al eliminar la lectura", error: error.message });
         };
     },
 };

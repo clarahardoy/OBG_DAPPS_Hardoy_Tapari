@@ -9,12 +9,12 @@ export const StatsController = {
             const month = req.query.month ? Number(req.query.month) : undefined;
 
             validateMonthYear(month, year);
-    
+
             const user = await User.findOne({ email: req.email }).select('_id');
             if (!user) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
-    
+
             const stats = await StatsService.getUserReadingStats(user._id, { year, month });
             res.status(200).json({ message: 'Estadísticas obtenidas con éxito', stats });
         } catch (error) {
@@ -26,5 +26,4 @@ export const StatsController = {
             res.status(status).json(errorResponse);
         }
     },
-}
-
+};

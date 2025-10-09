@@ -1,14 +1,15 @@
 import { ReviewService } from "../services/review.service.js";
 
 export const ReviewController = {
-    createReview:  async (req, res) => {
+    createReview: async (req, res) => {
         try {
             const reviewData = req.body;
             console.log(reviewData);
             const newReview = await ReviewService.createReview(reviewData);
             res.status(201).json({ message: "Reseña creada con éxito", newReview });
         } catch (error) {
-            res.status(500).json({ message: "Error al crear la reseña", error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ message: "Error al crear la reseña", error: error.message });
         };
     },
 
@@ -17,7 +18,8 @@ export const ReviewController = {
             const reviews = await ReviewService.getAllReviews();
             res.status(200).json({ message: "Reseñas cargadas con éxito", reviews });
         } catch (error) {
-            res.status(500).json({ message: "Error al obtener las reseñas", error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ message: "Error al obtener las reseñas", error: error.message });
         };
     },
 
@@ -27,7 +29,8 @@ export const ReviewController = {
             const review = await ReviewService.getReviewById(id);
             res.status(200).json({ message: "Reseña encotrada con éxito", review });
         } catch (error) {
-            res.status(500).json({ message: "Error al obtener la reseña", error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ message: "Error al obtener la reseña", error: error.message });
         }
     },
 
@@ -47,7 +50,8 @@ export const ReviewController = {
             const deletedReview = await ReviewService.deleteReviewById(id);
             res.status(200).json({ message: "Reseña eliminada con éxito", deletedReview });
         } catch (error) {
-            res.status(500).json({ message: "Error al eliminar la reseña", error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ message: "Error al eliminar la reseña", error: error.message });
         }
     }
 }

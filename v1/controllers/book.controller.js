@@ -7,14 +7,14 @@ export const BookController = {
             const { q: query, maxResults = 10, startIndex = 0 } = req.query;
 
             if (!query || query.trim() === '') {
-                return res.status(400).json({ 
-                    error: "Parámetro de búsqueda 'q' es requerido" 
+                return res.status(400).json({
+                    error: "Parámetro de búsqueda 'q' es requerido"
                 });
             }
 
             const results = await BookService.getBooksFromApi(
-                query.trim(), 
-                parseInt(maxResults), 
+                query.trim(),
+                parseInt(maxResults),
                 parseInt(startIndex)
             );
 
@@ -24,7 +24,8 @@ export const BookController = {
             });
 
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ error: error.message });
         }
     },
 
@@ -33,8 +34,8 @@ export const BookController = {
             const { title, author, category, maxResults = 10, startIndex = 0 } = req.query;
 
             if (!title && !author && !category) {
-                return res.status(400).json({ 
-                    error: "Al menos un filtro es requerido: title, author, o category" 
+                return res.status(400).json({
+                    error: "Al menos un filtro es requerido: title, author, o category"
                 });
             }
 
@@ -52,7 +53,8 @@ export const BookController = {
             });
 
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ error: error.message });
         }
     },
 
@@ -61,8 +63,8 @@ export const BookController = {
             const { googleBooksId } = req.params;
 
             if (!googleBooksId) {
-                return res.status(400).json({ 
-                    error: "Google Books ID es requerido" 
+                return res.status(400).json({
+                    error: "Google Books ID es requerido"
                 });
             }
 
@@ -74,7 +76,8 @@ export const BookController = {
             });
 
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            const status = error.status || 500;
+            res.status(status).json({ error: error.message });
         }
     },
 };
