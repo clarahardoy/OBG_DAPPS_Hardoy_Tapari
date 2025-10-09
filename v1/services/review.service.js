@@ -1,6 +1,7 @@
 import Review from "../models/review.model.js";
 import { ReadingService } from "./reading.service.js";
 import { setReadingDates } from "../utils/set-reading-date.js";
+import { ReadingStatus } from "../models/enums/reading-status.enum.js";
 
 export const ReviewService = {
     validateStatusIsOk: async (readingId) => {
@@ -8,7 +9,7 @@ export const ReviewService = {
         const reading = await ReadingService.getReadingById(readingId);
     
         // Valida que su status sea FINISHED
-        if (reading.status !== 'FINISHED') {
+        if (reading.status !== ReadingStatus.FINISHED) {
             const err = new Error('Solo se pueden hacer reseñas de lecturas finalizadas');
             err.status = 409;
             throw err;

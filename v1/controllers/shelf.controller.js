@@ -1,6 +1,7 @@
 import { ShelfService } from '../services/shelf.service.js';
 import { ReadingService } from '../services/reading.service.js';
 import { BookService } from '../services/book.service.js';
+import { ReadingStatus } from '../models/enums/reading-status.enum.js';
 
 export const ShelfController = {
 
@@ -69,7 +70,7 @@ export const ShelfController = {
 
     addReadingToShelf: async (req, res) => {
         try {
-            const { id, googleBooksId, status = 'WANT_TO_READ' } = req.body;
+            const { id, googleBooksId, status = ReadingStatus.WANT_TO_READ } = req.body;
             const userId = req.user.id;
 
             await ShelfService.validateShelfBelongsToUser(id, userId);
@@ -81,7 +82,7 @@ export const ShelfController = {
                 bookId: book._id,
                 status,
                 pageCount: book.pages,
-                currentPage: status === 'FINISHED' ? book.pages : 0,
+                currentPage: status === ReadingStatus.FINISHED ? book.pages : 0,
             };
 
             const newReading = await ReadingService.createReading(readingData);
