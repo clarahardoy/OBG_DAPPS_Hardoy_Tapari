@@ -75,7 +75,7 @@ export const ShelfService = {
                 throw new Error('Usuario no encontrado', { status: 404 });
             }
             const amountOfReadingsNow = await ReadingService.countReadingsByShelfId(shelfId);
-            const allowedMax = user.getAllowedReadingsMax()
+            const allowedMax = await user.getAllowedReadingsMax()
             if ((Number.isFinite(allowedMax)) && (amountOfReadingsNow >= allowedMax)) {
                 throw new Error(`Límite de ${allowedMax} libros alcanzado para el plan actual`);
             }
@@ -91,7 +91,7 @@ export const ShelfService = {
             if (!user) {
                 throw new Error('Usuario no encontrado', { status: 404 });
             }
-            return user.getMembershipType() === MembershipType.PREMIUM;
+            return await user.getMembershipType() === MembershipType.PREMIUM;
         } catch (error) {
             throw new Error(`Error al validar: ${error.message}`);
         }

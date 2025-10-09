@@ -1,8 +1,9 @@
 import User from "../models/user.model.js";
 import bcrypt from 'bcryptjs';
 import { sign } from "../utils/sign.utils.js";
+import { MembershipType } from "../models/enums/membership-type.enum.js";
 
-export const registerService = async ({ email, password, name, surname, role }) => {
+export const registerService = async ({ email, password, name, surname, role, membership }) => {
     const userExiste = await User.findOne({ email });
     if (userExiste) {
         let error = new Error("No se ha podido registrar el usuario");
@@ -10,7 +11,7 @@ export const registerService = async ({ email, password, name, surname, role }) 
         throw error;
     }
     const hashPassword = bcrypt.hashSync(password, 12);
-    const user = new User({ email, password: hashPassword, name, surname, role });
+    const user = new User({ email, password: hashPassword, name, surname, role, membership: MembershipType.BASIC });
     await user.save();
     const token = sign(user);
     return token;
