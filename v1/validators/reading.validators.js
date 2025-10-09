@@ -51,19 +51,5 @@ export const addReadingSchema = Joi.object({
 
 export const updateReadingSchema = Joi.object({
     status: Joi.string().valid('FINISHED', 'ABANDONED', 'CURRENTLY_READING', 'WANT_TO_READ'),
-    startedReading: Joi.date(),
-    finishedReading: Joi.date(),
-    pageCount: Joi.number().min(1),
-    currentPage: Joi.number().min(0)
-}).min(1) // al menos un campo debe estar presente
-    .custom((value, helpers) => {
-        if (value.currentPage !== undefined && value.pageCount !== undefined) {
-            if (value.currentPage > value.pageCount) {
-                return helpers.error("any.invalid");
-            }
-        }
-        return value;
-    }, "currentPage <= pageCount")
-    .messages({
-        "any.invalid": "La página actual no puede superar el total de páginas."
-    });
+    currentPage: Joi.number().min(0).optional()
+});

@@ -4,6 +4,7 @@ export const ReviewController = {
     createReview:  async (req, res) => {
         try {
             const reviewData = req.body;
+            console.log(reviewData);
             const newReview = await ReviewService.createReview(reviewData);
             res.status(201).json({ message: "Reseña creada con éxito", newReview });
         } catch (error) {

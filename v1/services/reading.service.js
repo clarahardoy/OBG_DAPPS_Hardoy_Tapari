@@ -2,6 +2,7 @@ import Reading from "../models/reading.model.js";
 import { setReadingDates } from "../utils/set-reading-date.js";
 import { ShelfService } from "./shelf.service.js";
 import { UserService } from "./user.service.js";
+import { ReadingStatus } from "../models/enums/reading-status.enum.js";
 import { BookService } from "./book.service.js";
 
 // Agreagr una nueva lectura POST
@@ -9,38 +10,38 @@ import { BookService } from "./book.service.js";
 export const ReadingService = {
 
     createReading: async (readingData) => {
-            try {
-                const shelf = await ShelfService.findShelfById(readingData.shelfId);
-                const user = await UserService.getUserById(shelf.userId);
-                let limit = await user.getAllowedReadingsMax();
-                
-                if (limit !== null) {
-                    const currentCount = await ReadingService.countReadingsByShelfId(shelf._id);
-                    if (currentCount >= limit) {
-                        const err = new Error("Se alcanzó el límite de lecturas.");
-                        err.status = 403;
-                        throw err;
-                    };
+        try {
+            const shelf = await ShelfService.findShelfById(readingData.shelfId);
+            const user = await UserService.getUserById(shelf.userId);
+            let limit = await user.getAllowedReadingsMax();
+
+            if (limit !== null) {
+                const currentCount = await ReadingService.countReadingsByShelfId(shelf._id);
+                if (currentCount >= limit) {
+                    const err = new Error("Se alcanzó el límite de lecturas.");
+                    err.status = 403;
+                    throw err;
                 };
-
-                const newReading = new Reading(readingData);
-
-                // Que se autocompleten las fechas según status
-                setReadingDates(newReading);
-
-                await newReading.save();
-
-                const populatedReading = await Reading.findById(newReading._id)
-                    .populate("googleBooksId")
-                    .populate("shelfId");
-                
-                return populatedReading;
-            } catch (error) {
-                let err = new Error(`Error al agregar la lectura: ${error.message}`);
-                err.status = error.status || 500;
-                throw err;
             };
-        },
+
+            const newReading = new Reading(readingData);
+
+            // Que se autocompleten las fechas según status
+            setReadingDates(newReading);
+
+            await newReading.save();
+
+            const populatedReading = await Reading.findById(newReading._id)
+                .populate("googleBooksId")
+                .populate("shelfId");
+
+            return populatedReading;
+        } catch (error) {
+            let err = new Error(`Error al agregar la lectura: ${error.message}`);
+            err.status = error.status || 500;
+            throw err;
+        };
+    },
 
     getAllReadings: async () => {
         // Buscar todas las lecturas y popular el campo book
@@ -85,14 +86,19 @@ export const ReadingService = {
         const reading = await ReadingService.getReadingById(id);
         const book = await BookService.findBookByGoogleBooksId(reading.googleBooksId);
         const pageCount = book.pages;
-        
-        if (!ReadingService.pageCountIsValid(updateData.currentPage, pageCount)) {
+        console.log(pageCount);
+        console.log(updateData);
+        if (updateData.status === ReadingStatus.FINISHED) {
+            updateData.currentPage = pageCount;
+        }
+        if (updateData && !ReadingService.pageCountIsValid(updateData.currentPage, pageCount)) {
 
             const err = new Error('La página actual no puede ser mayor al total de páginas');
             err.status = 400;
             throw err;
         }
-        
+
+
         // Aseguramos formato de "update operator" para que el middleware pueda operar ($set/$unset)
         const update = { $set: { ...updateData } };
 
