@@ -71,8 +71,6 @@ export const ShelfController = {
     addReadingToShelf: async (req, res) => {
         try {
             console.log('Request body:', req.body);
-            const { shelfId, googleBooksId, status = ReadingStatus.WANT_TO_READ } = req.body;
-            const userId = req.user.id;
             const { shelfId, googleBooksId, status } = req.body;
             const userId = req.userId;
 
