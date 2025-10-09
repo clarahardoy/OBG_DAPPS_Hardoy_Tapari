@@ -82,7 +82,8 @@ export const ReadingService = {
     },
     // Actualizar una lectura por ID PUT
     updateReadingById: async (id, updateData) => {
-        const book = await BookService.getBookById(updateData.googleBooksId);
+        const reading = await ReadingService.getReadingById(id);
+        const book = await BookService.getBookById(reading.googleBooksId);
         const pageCount = book.pageCount;
 
         if (!ReadingService.pageCountIsValid(updateData.currentPage, pageCount)) {
