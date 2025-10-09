@@ -1,4 +1,5 @@
 import { ReadingService } from '../services/reading.service.js';
+import { BookService } from '../services/book.service.js';
 
 export const ReadingController = {
     createReading: async (req, res) => {
@@ -34,6 +35,7 @@ export const ReadingController = {
         try {
             const { id } = req.params;
             const updateData = req.body;
+
             const updatedReading = await ReadingService.updateReadingById(id, updateData);
             res.status(200).json({ message: "Lectura actualizada con éxito", updatedReading });
         } catch (error) {
