@@ -78,7 +78,7 @@ export const BookService = {
 
   findOrCreateBook: async (googleBooksId) => {
     try {
-      const book = await BookService.findBookByGoogleBooksId(googleBooksId);
+      let book = await BookService.findBookByGoogleBooksId(googleBooksId);
       if (!book) {
         // si no existe, buscar de google books y crearlo en la
         const googleBookData = await BookService.getBookFromApiById(googleBooksId);
