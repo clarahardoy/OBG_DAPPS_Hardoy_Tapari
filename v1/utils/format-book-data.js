@@ -2,21 +2,26 @@ const formatBookData = (bookData) => {
   const volumeInfo = bookData.volumeInfo || {};
   const imageLinks = volumeInfo.imageLinks || {};
 
+  const parseDate = (dateString) => {
+    if (!dateString) return new Date();
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? new Date() : date;
+  };
+
   return {
-    //ver cuales necesitamos y cuales no
-    googleBooksId: bookData.id,
-    title: volumeInfo.title || 'Unknown Title',
-    author: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown Author',
-    pages: volumeInfo.pageCount || null,
-    genre: volumeInfo.categories ? volumeInfo.categories.join(', ') : null,
-    sinopsis: volumeInfo.description || null,
+    googleBooksId: bookData.id || '',
+    title: volumeInfo.title || 'Título desconocido',
+    author: volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Autor desconocido',
+    pages: volumeInfo.pageCount || 0,
+    genre: volumeInfo.categories ? volumeInfo.categories.join(', ') : 'Sin categoría',
+    sinopsis: volumeInfo.description || 'Sin descripción disponible',
     eBook: bookData.saleInfo?.isEbook || false,
-    publicationDate: volumeInfo.publishedDate || null,
-    publisher: volumeInfo.publisher || null,
-    thumbnail: imageLinks.thumbnail || imageLinks.smallThumbnail || null,
-    previewLink: volumeInfo.previewLink || null,
-    averageRating: volumeInfo.averageRating || null,
-    ratingsCount: volumeInfo.ratingsCount || null
+    publicationDate: parseDate(volumeInfo.publishedDate),
+    publisher: volumeInfo.publisher || 'Editorial desconocida',
+    thumbnail: imageLinks.thumbnail || imageLinks.smallThumbnail || '',
+    previewLink: volumeInfo.previewLink || '',
+    averageRating: volumeInfo.averageRating || 0,
+    ratingsCount: volumeInfo.ratingsCount || 0
   };
 };
 
