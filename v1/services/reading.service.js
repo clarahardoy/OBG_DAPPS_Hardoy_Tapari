@@ -51,7 +51,7 @@ export const ReadingService = {
 
                 console.log('Populating reading with book and shelf data...');
                 const populatedReading = await Reading.findById(newReading._id)
-                    .populate("bookId")
+                    .populate("googleBooksId")
                     .populate("shelfId");
                 console.log('Reading populated successfully');
                 
@@ -67,7 +67,7 @@ export const ReadingService = {
     getAllReadings: async () => {
         // Buscar todas las lecturas y popular el campo book
         const readings = await Reading.find()
-            .populate("bookId")
+            .populate("googleBooksId")
             .populate("shelfId");
 
         // Si no se encontraron lecturas avisar con error 404
@@ -86,7 +86,7 @@ export const ReadingService = {
         let reading;
         try {
             reading = await Reading.findById(id)
-                .populate("bookId")
+                .populate("googleBooksId")
                 .populate("shelfId");
         } catch (error) {
             let err = new Error('Error al encotrar la lectura');
@@ -116,7 +116,7 @@ export const ReadingService = {
                 new: true,
                 runValidators: true, // valida contra el schema
             })
-                .populate("bookId")
+                .populate("googleBooksId")
                 .populate("shelfId");
         } catch (error) {
             let err = new Error('Error al actualizar la lectura');

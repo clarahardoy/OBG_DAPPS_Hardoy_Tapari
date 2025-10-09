@@ -81,7 +81,7 @@ export const StatsService = {
             {
                 $lookup: {
                     from: Book.collection.name,
-                    localField: "bookId",
+                    localField: "googleBooksId",
                     foreignField: "_id",
                     as: "book"
                 }

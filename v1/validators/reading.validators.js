@@ -6,7 +6,7 @@ export const addReadingSchema = Joi.object({
         "string.empty": "El campo de Estante no puede estar vacío.",
         "any.required": "El Estante es obligatorio."
     }),
-    bookId: Joi.string().required().messages({
+    googleBooksId: Joi.string().required().messages({
         "string.base": "Debe ser un texto.",
         "string.empty": "El campo de Libro no puede estar vacío.",
         "any.required": "El Libro es obligatorio."

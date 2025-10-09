@@ -36,7 +36,7 @@ export const ReviewService = {
             await newReview.save();
             return await Review.findById(newReview._id)
                 .populate('userId')
-                .populate({ path: 'reading', populate: [{ path: 'bookId' }, { path: 'shelfId' }] });
+                .populate({ path: 'reading', populate: [{ path: 'googleBooksId' }, { path: 'shelfId' }] });
         } catch (error) {
             let err = new Error('Error al agregar la reseña');
             err.status = 500;
@@ -47,7 +47,7 @@ export const ReviewService = {
     getAllReviews: async () => {
         return await Review.find()
             .populate('userId')
-            .populate({ path: 'reading', populate: [{ path: 'bookId' }, { path: 'shelfId' }] });
+            .populate({ path: 'reading', populate: [{ path: 'googleBooksId' }, { path: 'shelfId' }] });
     },
     
     getReviewById: async (id) => {
@@ -55,7 +55,7 @@ export const ReviewService = {
         try {
             review = await Review.findById(id)
                 .populate('userId')
-                .populate({ path: 'reading', populate: [{ path: 'bookId' }, { path: 'shelfId' }] });
+                .populate({ path: 'reading', populate: [{ path: 'googleBooksId' }, { path: 'shelfId' }] });
         } catch (error) {
             let err = new Error('Error al encontrar la reseña');
             err.status = 400;
