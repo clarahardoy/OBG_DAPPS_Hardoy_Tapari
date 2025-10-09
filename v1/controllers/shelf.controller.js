@@ -71,16 +71,16 @@ export const ShelfController = {
     addReadingToShelf: async (req, res) => {
         try {
             console.log('Request body:', req.body);
-            const { id, shelfId, googleBooksId, status = ReadingStatus.WANT_TO_READ } = req.body;
-            const userId = req.user.id;
+            const { shelfId, googleBooksId, status } = req.body;
+            const userId = req.userId;
 
-            await ShelfService.validateShelfBelongsToUser(id, userId);
-            await ShelfService.shelfHasSpaceLeft(id, userId);
+            await ShelfService.validateShelfBelongsToUser(shelfId, userId);
+            await ShelfService.shelfHasSpaceLeft(shelfId, userId);
             const book = await BookService.findOrCreateBook(googleBooksId);
 
             const readingData = {
                 shelfId: shelfId,
-                bookId: book._id,
+                googleBooksId: googleBooksId,
                 status,
                 pageCount: book.pages,
                 currentPage: status === ReadingStatus.FINISHED ? book.pages : 0,
