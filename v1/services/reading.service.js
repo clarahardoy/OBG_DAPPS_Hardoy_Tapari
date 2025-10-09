@@ -2,6 +2,7 @@ import Reading from "../models/reading.model.js";
 import { setReadingDates } from "../utils/set-reading-date.js";
 import { ShelfService } from "./shelf.service.js";
 import { UserService } from "./user.service.js";
+import { BookService } from "./book.service.js";
 
 // Agreagr una nueva lectura POST
 
@@ -81,34 +82,15 @@ export const ReadingService = {
     },
     // Actualizar una lectura por ID PUT
     updateReadingById: async (id, updateData) => {
-        console.log('🔍 DEBUG updateReadingById:');
-        console.log('  - ID:', id);
-        console.log('  - updateData:', updateData);
-        console.log('  - currentPage:', updateData.currentPage, '(type:', typeof updateData.currentPage, ')');
-        console.log('  - pageCount:', updateData.pageCount, '(type:', typeof updateData.pageCount, ')');
-        
-        if (!ReadingService.pageCountIsValid(updateData.currentPage, updateData.pageCount)) {
-            console.log('❌ VALIDATION FAILED:');
-            console.log('  - currentPage:', updateData.currentPage);
-            console.log('  - pageCount:', updateData.pageCount);
-            console.log('  - Comparison result:', updateData.currentPage <= updateData.pageCount);
+        const book = await BookService.getBookById(updateData.googleBooksId);
+        const pageCount = book.pageCount;
+
+        if (!ReadingService.pageCountIsValid(updateData.currentPage, pageCount)) {
             const err = new Error('La página actual no puede ser mayor al total de páginas');
             err.status = 400;
             throw err;
         }
         
-        console.log('✅ VALIDATION PASSED');
-
-        // Let's also check what the existing reading looks like
-        console.log('🔍 DEBUG - Checking existing reading before update:');
-        const existingReading = await Reading.findById(id);
-        if (existingReading) {
-            console.log('  - Existing currentPage:', existingReading.currentPage);
-            console.log('  - Existing pageCount:', existingReading.pageCount);
-        } else {
-            console.log('  - No existing reading found');
-        }
-
         // Aseguramos formato de "update operator" para que el middleware pueda operar ($set/$unset)
         const update = { $set: { ...updateData } };
 
