@@ -9,13 +9,23 @@ export const ReadingService = {
 
     createReading: async (readingData) => {
             try {
+                console.log('ReadingService.createReading called with:', readingData);
 
+                console.log('Finding shelf by ID...');
                 const shelf = await ShelfService.findShelfById(readingData.shelfId);
-                const user = await UserService.getUserById(shelf.userId);
+                console.log('Shelf found:', { shelfId: shelf._id, userId: shelf.userId });
 
+                console.log('Finding user by ID...');
+                const user = await UserService.getUserById(shelf.userId);
+                console.log('User found:', { userId: user._id });
+
+                console.log('Checking reading limits...');
                 let limit = await user.getAllowedReadingsMax();
+                console.log('User reading limit:', limit);
+                
                 if (limit !== null) {
                     const currentCount = await ReadingService.countReadingsByShelfId(shelf._id);
+                    console.log('Current readings count:', currentCount);
                     if (currentCount >= limit) {
                         const err = new Error("Se alcanzó el límite de lecturas.");
                         err.status = 403;
@@ -23,16 +33,33 @@ export const ReadingService = {
                     };
                 };
 
+                console.log('Creating new Reading object...');
                 const newReading = new Reading(readingData);
+                console.log('Reading object created:', newReading);
+
+                console.log('Setting reading dates...');
                 // Que se autocompleten las fechas según status
                 setReadingDates(newReading);
+                console.log('Reading dates set:', { 
+                    startedReading: newReading.startedReading, 
+                    finishedReading: newReading.finishedReading 
+                });
+
+                console.log('Saving reading to database...');
                 await newReading.save();
-                return await Reading.findById(newReading._id)
+                console.log('Reading saved successfully, ID:', newReading._id);
+
+                console.log('Populating reading with book and shelf data...');
+                const populatedReading = await Reading.findById(newReading._id)
                     .populate("bookId")
                     .populate("shelfId");
+                console.log('Reading populated successfully');
+                
+                return populatedReading;
             } catch (error) {
-                let err = new Error('Error al agregar la lectura', error.message);
-                err.status = 500;
+                console.error('Error in ReadingService.createReading:', error);
+                let err = new Error(`Error al agregar la lectura: ${error.message}`);
+                err.status = error.status || 500;
                 throw err;
             };
         },
