@@ -70,7 +70,8 @@ export const ShelfController = {
 
     addReadingToShelf: async (req, res) => {
         try {
-            const { id, googleBooksId, status = ReadingStatus.WANT_TO_READ } = req.body;
+            console.log('Request body:', req.body);
+            const { id, shelfId, googleBooksId, status = ReadingStatus.WANT_TO_READ } = req.body;
             const userId = req.user.id;
 
             await ShelfService.validateShelfBelongsToUser(id, userId);
@@ -78,7 +79,7 @@ export const ShelfController = {
             const book = await BookService.findOrCreateBook(googleBooksId);
 
             const readingData = {
-                shelfId: id,
+                shelfId: shelfId,
                 bookId: book._id,
                 status,
                 pageCount: book.pages,
