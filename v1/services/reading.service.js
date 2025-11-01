@@ -42,12 +42,11 @@ export const ReadingService = {
 				{ new: true }
 			);
 
-			// Get book information and add it to the reading
-			const book = await BookService.findBookByGoogleBooksId(
+			const book = await BookService.findOrCreateBook(
 				readingData.googleBooksId
 			);
 			const readingObj = newReading.toObject();
-			readingObj.book = book || null;
+			readingObj.book = book;
 
 			return readingObj;
 		} catch (error) {
@@ -58,20 +57,24 @@ export const ReadingService = {
 	},
 
 	getAllReadings: async () => {
-		// Buscar todas las lecturas y popular el campo book
-		const readings = await Reading.find()
-			.populate('googleBooksId')
-			.populate('shelfId');
+		const readings = await Reading.find();
 
-		// Si no se encontraron lecturas avisar con error 404
 		if (!readings || readings.length === 0) {
 			let err = new Error('No se encontraron lecturas');
 			err.status = 404;
 			throw err;
 		}
 
-		// Devolver la lista de lecturas
-		return readings;
+		const readingsWithBooks = await Promise.all(
+			readings.map(async (reading) => {
+				const book = await BookService.findOrCreateBook(reading.googleBooksId);
+				const readingObj = reading.toObject();
+				readingObj.book = book;
+				return readingObj;
+			})
+		);
+
+		return readingsWithBooks;
 	},
 
 	// Obtener una lectura por ID GET
@@ -91,21 +94,29 @@ export const ReadingService = {
 			throw err;
 		}
 
-		// agregar toda la infio del libro en la respuesta
-		const book = await BookService.findBookByGoogleBooksId(
-			reading.googleBooksId
-		);
+		// agregar toda la info del libro en la respuesta
+		const book = await BookService.findOrCreateBook(reading.googleBooksId);
 		const readingObj = reading.toObject();
-		readingObj.book = book || null;
+		readingObj.book = book;
 
 		return readingObj;
 	},
 	// Actualizar una lectura por ID PUT
 	updateReadingById: async (id, updateData) => {
-		const reading = await ReadingService.getReadingById(id);
-		const book = await BookService.findBookByGoogleBooksId(
-			reading.googleBooksId
-		);
+		const reading = await Reading.findById(id);
+		if (!reading) {
+			const err = new Error('No se encontró la lectura');
+			err.status = 404;
+			throw err;
+		}
+
+		const book = await BookService.findOrCreateBook(reading.googleBooksId);
+		if (!book) {
+			const err = new Error('Libro no encontrado');
+			err.status = 404;
+			throw err;
+		}
+
 		const pageCount = book.pages;
 		if (updateData.status === ReadingStatus.FINISHED) {
 			updateData.currentPage = pageCount;
@@ -132,7 +143,7 @@ export const ReadingService = {
 			updatedReading = await Reading.findByIdAndUpdate(id, update, {
 				new: true,
 				runValidators: true, // valida contra el schema
-			}).populate('googleBooksId');
+			});
 		} catch (error) {
 			let err = new Error('Error al actualizar la lectura');
 			err.status = 400;
@@ -145,7 +156,10 @@ export const ReadingService = {
 			throw err;
 		}
 
-		return updatedReading;
+		const readingObj = updatedReading.toObject();
+		readingObj.book = book;
+
+		return readingObj;
 	},
 
 	deleteReadingById: async (id) => {
@@ -163,6 +177,31 @@ export const ReadingService = {
 			throw err;
 		}
 		return deleted;
+	},
+
+	getReadingsByShelfId: async (shelfId) => {
+		try {
+			if (!shelfId) {
+				throw new Error('Shelf ID requerido');
+			}
+			const readings = await Reading.find({ shelfId });
+
+			// Agregar información del libro a cada reading
+			const readingsWithBooks = await Promise.all(
+				readings.map(async (reading) => {
+					const book = await BookService.findOrCreateBook(
+						reading.googleBooksId
+					);
+					const readingObj = reading.toObject();
+					readingObj.book = book;
+					return readingObj;
+				})
+			);
+
+			return readingsWithBooks;
+		} catch (error) {
+			throw new Error(`Error al obtener las lecturas: ${error.message}`);
+		}
 	},
 
 	countReadingsByShelfId: async (shelfId) => {
