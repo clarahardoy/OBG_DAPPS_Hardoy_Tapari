@@ -1,153 +1,169 @@
-import Reading from "../models/reading.model.js";
-import { setReadingDates } from "../utils/set-reading-date.js";
-import { ShelfService } from "./shelf.service.js";
-import { UserService } from "./user.service.js";
-import { ReadingStatus } from "../models/enums/reading-status.enum.js";
-import { BookService } from "./book.service.js";
+import Reading from '../models/reading.model.js';
+import { setReadingDates } from '../utils/set-reading-date.js';
+import { ShelfService } from './shelf.service.js';
+import { UserService } from './user.service.js';
+import { ReadingStatus } from '../models/enums/reading-status.enum.js';
+import { BookService } from './book.service.js';
+import Shelf from '../models/shelf.model.js';
 
 // Agreagr una nueva lectura POST
 
 export const ReadingService = {
+	createReading: async (readingData) => {
+		try {
+			const shelf = await ShelfService.findShelfById(readingData.shelfId);
+			const user = await UserService.getUserById(shelf.userId);
+			let limit = await user.getAllowedReadingsMax();
 
-    createReading: async (readingData) => {
-        try {
-            const shelf = await ShelfService.findShelfById(readingData.shelfId);
-            const user = await UserService.getUserById(shelf.userId);
-            let limit = await user.getAllowedReadingsMax();
+			if (limit !== null) {
+				const currentCount = await ReadingService.countReadingsByShelfId(
+					shelf._id
+				);
+				if (currentCount >= limit) {
+					const err = new Error('Se alcanzó el límite de lecturas.');
+					err.status = 403;
+					throw err;
+				}
+			}
 
-            if (limit !== null) {
-                const currentCount = await ReadingService.countReadingsByShelfId(shelf._id);
-                if (currentCount >= limit) {
-                    const err = new Error("Se alcanzó el límite de lecturas.");
-                    err.status = 403;
-                    throw err;
-                };
-            };
+			const newReading = new Reading(readingData);
 
-            const newReading = new Reading(readingData);
+			// Que se autocompleten las fechas según status
+			setReadingDates(newReading);
 
-            // Que se autocompleten las fechas según status
-            setReadingDates(newReading);
+			await newReading.save();
 
-            await newReading.save();
+			await Shelf.findByIdAndUpdate(
+				readingData.shelfId,
+				{
+					$addToSet: { readings: newReading._id },
+					$set: { updatedAt: new Date() },
+				},
+				{ new: true }
+			);
 
-            const populatedReading = await Reading.findById(newReading._id)
-                .populate("googleBooksId")
-                .populate("shelfId");
+			const populatedReading = await Reading.findById(newReading._id)
+				.populate('googleBooksId')
+				.populate('shelfId');
 
-            return populatedReading;
-        } catch (error) {
-            let err = new Error(`Error al agregar la lectura: ${error.message}`);
-            err.status = error.status || 500;
-            throw err;
-        };
-    },
+			return populatedReading;
+		} catch (error) {
+			let err = new Error(`Error al agregar la lectura: ${error.message}`);
+			err.status = error.status || 500;
+			throw err;
+		}
+	},
 
-    getAllReadings: async () => {
-        // Buscar todas las lecturas y popular el campo book
-        const readings = await Reading.find()
-            .populate("googleBooksId")
-            .populate("shelfId");
+	getAllReadings: async () => {
+		// Buscar todas las lecturas y popular el campo book
+		const readings = await Reading.find()
+			.populate('googleBooksId')
+			.populate('shelfId');
 
-        // Si no se encontraron lecturas avisar con error 404
-        if (!readings || readings.length === 0) {
-            let err = new Error('No se encontraron lecturas');
-            err.status = 404;
-            throw err;
-        };
+		// Si no se encontraron lecturas avisar con error 404
+		if (!readings || readings.length === 0) {
+			let err = new Error('No se encontraron lecturas');
+			err.status = 404;
+			throw err;
+		}
 
-        // Devolver la lista de lecturas
-        return readings;
-    },
+		// Devolver la lista de lecturas
+		return readings;
+	},
 
-    // Obtener una lectura por ID GET
-    getReadingById: async (id) => {
-        let reading;
-        try {
-            reading = await Reading.findById(id)
-                .populate("googleBooksId")
-                .populate("shelfId");
-        } catch (error) {
-            let err = new Error('Error al encotrar la lectura');
-            err.status = 400;
-            throw err;
-        };
+	// Obtener una lectura por ID GET
+	getReadingById: async (id) => {
+		let reading;
+		try {
+			reading = await Reading.findById(id)
+				.populate('googleBooksId')
+				.populate('shelfId');
+		} catch (error) {
+			let err = new Error('Error al encotrar la lectura');
+			err.status = 400;
+			throw err;
+		}
 
-        if (!reading) {
-            let err = new Error('No se encontró la lectura');
-            err.status = 404;
-            throw err;
-        };
+		if (!reading) {
+			let err = new Error('No se encontró la lectura');
+			err.status = 404;
+			throw err;
+		}
 
-        return reading;
-    },
-    // Actualizar una lectura por ID PUT
-    updateReadingById: async (id, updateData) => {
-        const reading = await ReadingService.getReadingById(id);
-        const book = await BookService.findBookByGoogleBooksId(reading.googleBooksId);
-        const pageCount = book.pages;
-        if (updateData.status === ReadingStatus.FINISHED) {
-            updateData.currentPage = pageCount;
-        }
-        if (updateData && !ReadingService.pageCountIsValid(updateData.currentPage, pageCount)) {
+		return reading;
+	},
+	// Actualizar una lectura por ID PUT
+	updateReadingById: async (id, updateData) => {
+		const reading = await ReadingService.getReadingById(id);
+		const book = await BookService.findBookByGoogleBooksId(
+			reading.googleBooksId
+		);
+		const pageCount = book.pages;
+		if (updateData.status === ReadingStatus.FINISHED) {
+			updateData.currentPage = pageCount;
+		}
+		if (
+			updateData &&
+			!ReadingService.pageCountIsValid(updateData.currentPage, pageCount)
+		) {
+			const err = new Error(
+				'La página actual no puede ser mayor al total de páginas'
+			);
+			err.status = 400;
+			throw err;
+		}
 
-            const err = new Error('La página actual no puede ser mayor al total de páginas');
-            err.status = 400;
-            throw err;
-        }
+		// Aseguramos formato de "update operator" para que el middleware pueda operar ($set/$unset)
+		const update = { $set: { ...updateData } };
 
+		// Aplica reglas de fechas/updatedAt según status/cambios
+		setReadingDates(update);
 
-        // Aseguramos formato de "update operator" para que el middleware pueda operar ($set/$unset)
-        const update = { $set: { ...updateData } };
+		let updatedReading;
+		try {
+			updatedReading = await Reading.findByIdAndUpdate(id, update, {
+				new: true,
+				runValidators: true, // valida contra el schema
+			})
+				.populate('googleBooksId')
+				.populate('shelfId');
+		} catch (error) {
+			let err = new Error('Error al actualizar la lectura');
+			err.status = 400;
+			throw err;
+		}
 
-        // Aplica reglas de fechas/updatedAt según status/cambios
-        setReadingDates(update);
+		if (!updatedReading) {
+			const err = new Error('No se encontró la lectura para actualizar');
+			err.status = 404;
+			throw err;
+		}
 
-        let updatedReading;
-        try {
-            updatedReading = await Reading.findByIdAndUpdate(id, update, {
-                new: true,
-                runValidators: true, // valida contra el schema
-            })
-                .populate("googleBooksId")
-                .populate("shelfId");
-        } catch (error) {
-            let err = new Error('Error al actualizar la lectura');
-            err.status = 400;
-            throw err;
-        };
+		return updatedReading;
+	},
 
-        if (!updatedReading) {
-            const err = new Error("No se encontró la lectura para actualizar");
-            err.status = 404;
-            throw err;
-        };
+	deleteReadingById: async (id) => {
+		let deleted;
+		try {
+			deleted = await Reading.findByIdAndDelete(id);
+		} catch {
+			const err = new Error('Error al eliminar la lectura');
+			err.status = 400;
+			throw err;
+		}
+		if (!deleted) {
+			const err = new Error('No se encontró la lectura para eliminar');
+			err.status = 404;
+			throw err;
+		}
+		return deleted;
+	},
 
-        return updatedReading;
-    },
+	countReadingsByShelfId: async (shelfId) => {
+		return await Reading.countDocuments({ shelfId });
+	},
 
-    deleteReadingById: async (id) => {
-        let deleted;
-        try {
-            deleted = await Reading.findByIdAndDelete(id);
-        } catch {
-            const err = new Error("Error al eliminar la lectura");
-            err.status = 400;
-            throw err;
-        };
-        if (!deleted) {
-            const err = new Error("No se encontró la lectura para eliminar");
-            err.status = 404;
-            throw err;
-        };
-        return deleted;
-    },
-
-    countReadingsByShelfId: async (shelfId) => {
-        return await Reading.countDocuments({ shelfId });
-    },
-
-    pageCountIsValid: (currentPage, pageCount) => {
-        return currentPage <= pageCount;
-    },
-}
+	pageCountIsValid: (currentPage, pageCount) => {
+		return currentPage <= pageCount;
+	},
+};
