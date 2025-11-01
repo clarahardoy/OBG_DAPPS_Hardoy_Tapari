@@ -66,12 +66,23 @@ export const ShelfService = {
 				throw new Error('Shelf ID requerido');
 			}
 			const readings = await ReadingService.getReadingsByShelfId(shelfId);
-			return readings;
+
+			const readingsWithBooks = await Promise.all(
+				readings.map(async (reading) => {
+					const book = await BookService.findBookByGoogleBooksId(
+						reading.googleBooksId
+					);
+					const readingObj = reading.toObject();
+					readingObj.book = book || null;
+					return readingObj;
+				})
+			);
+
+			return readingsWithBooks;
 		} catch (error) {
 			throw new Error(`Error al obtener las lecturas: ${error.message}`);
 		}
 	},
-
 	shelfHasSpaceLeft: async (shelfId, userId) => {
 		try {
 			const user = await UserService.getUserById(userId);

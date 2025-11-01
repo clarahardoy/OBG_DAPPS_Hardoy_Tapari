@@ -42,11 +42,14 @@ export const ReadingService = {
 				{ new: true }
 			);
 
-			const populatedReading = await Reading.findById(newReading._id)
-				.populate('googleBooksId')
-				.populate('shelfId');
+			// Get book information and add it to the reading
+			const book = await BookService.findBookByGoogleBooksId(
+				readingData.googleBooksId
+			);
+			const readingObj = newReading.toObject();
+			readingObj.book = book || null;
 
-			return populatedReading;
+			return readingObj;
 		} catch (error) {
 			let err = new Error(`Error al agregar la lectura: ${error.message}`);
 			err.status = error.status || 500;
@@ -75,9 +78,7 @@ export const ReadingService = {
 	getReadingById: async (id) => {
 		let reading;
 		try {
-			reading = await Reading.findById(id)
-				.populate('googleBooksId')
-				.populate('shelfId');
+			reading = await Reading.findById(id);
 		} catch (error) {
 			let err = new Error('Error al encotrar la lectura');
 			err.status = 400;
@@ -90,7 +91,14 @@ export const ReadingService = {
 			throw err;
 		}
 
-		return reading;
+		// agregar toda la infio del libro en la respuesta
+		const book = await BookService.findBookByGoogleBooksId(
+			reading.googleBooksId
+		);
+		const readingObj = reading.toObject();
+		readingObj.book = book || null;
+
+		return readingObj;
 	},
 	// Actualizar una lectura por ID PUT
 	updateReadingById: async (id, updateData) => {
@@ -124,9 +132,7 @@ export const ReadingService = {
 			updatedReading = await Reading.findByIdAndUpdate(id, update, {
 				new: true,
 				runValidators: true, // valida contra el schema
-			})
-				.populate('googleBooksId')
-				.populate('shelfId');
+			}).populate('googleBooksId');
 		} catch (error) {
 			let err = new Error('Error al actualizar la lectura');
 			err.status = 400;
