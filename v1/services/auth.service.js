@@ -38,7 +38,12 @@ export const registerService = async ({
 	};
 	await ShelfService.createShelf(shelfData);
 	const token = sign(user);
-	return token;
+	return {
+		token,
+		membership: user.membership,
+		maxReadings: user.getAllowedReadingsMax(),
+		role: user.role,
+	};
 };
 
 export const loginService = async ({ email, password }) => {
@@ -49,5 +54,10 @@ export const loginService = async ({ email, password }) => {
 		throw error;
 	}
 	const token = sign(user);
-	return token;
+	return {
+		token,
+		membership: user.membership,
+		maxReadings: user.getAllowedReadingsMax(),
+		role: user.role,
+	};
 };
