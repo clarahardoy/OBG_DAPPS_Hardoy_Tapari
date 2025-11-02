@@ -1,5 +1,6 @@
 import { ReadingService } from './reading.service.js';
 import Shelf from '../models/shelf.model.js';
+import BookService from './book.service.js';
 import { UserService } from './user.service.js';
 import { MembershipType } from '../models/enums/membership-type.enum.js';
 
