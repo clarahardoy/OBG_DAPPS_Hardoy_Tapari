@@ -6,6 +6,7 @@ import REVIEW_ROUTES from './routes/review.routes.js';
 import BOOK_ROUTES from './routes/book.routes.js';
 import SHELF_ROUTES from './routes/shelf.routes.js';
 import STATS_ROUTES from './routes/stats.routes.js';
+import MEMBERSHIP_ROUTES from './routes/membership.routes.js';
 import { authenticateMiddleware } from './middlewares/authenticate.middleware.js';
 import { authorizeRoleMiddleware } from './middlewares/authorize-role.middleware.js';
 
@@ -21,6 +22,7 @@ router.use('/readings', READING_ROUTES);
 router.use('/shelves', SHELF_ROUTES);
 router.use('/reviews', REVIEW_ROUTES);
 router.use('/books', BOOK_ROUTES);
+router.use('/membership', MEMBERSHIP_ROUTES);
 router.use('/users', authorizeRoleMiddleware(['admin']), USER_ROUTES);
 
 export default router;
