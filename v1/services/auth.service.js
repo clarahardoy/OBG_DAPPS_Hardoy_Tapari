@@ -11,14 +11,25 @@ export const registerService = async ({
 	surname,
 	role,
 	membership,
+	avatarUrl,
+	avatarPublicId
 }) => {
 	const userExiste = await User.findOne({ email });
 	if (userExiste) {
-		let error = new Error('No se ha podido registrar el usuario');
+		const error = new Error('No se ha podido registrar el usuario');
 		error.status = 409;
 		throw error;
 	}
+
+
+	if (!avatarUrl?.startsWith('https://res.cloudinary.com/')) {
+		const error = new Error('Avatar inválido');
+		error.status = 400;
+		throw error;
+	}
+
 	const hashPassword = bcrypt.hashSync(password, 12);
+
 	const user = new User({
 		email,
 		password: hashPassword,
@@ -26,7 +37,12 @@ export const registerService = async ({
 		surname,
 		role,
 		membership: MembershipType.BASIC,
+		avatar: {
+			url: avatarUrl,
+			publicId: avatarPublicId ?? null
+		}
 	});
+
 	await user.save();
 
 	const shelfName = `Estantería de ${name || 'Usuario'}`;
@@ -37,27 +53,33 @@ export const registerService = async ({
 		readings: [],
 	};
 	await ShelfService.createShelf(shelfData);
+
 	const token = sign(user);
+
 	return {
 		token,
 		membership: user.membership,
 		maxReadings: user.getAllowedReadingsMax(),
 		role: user.role,
+		avatarUrl: user.avatar.url
 	};
 };
 
 export const loginService = async ({ email, password }) => {
 	const user = await User.findOne({ email });
 	if (!user || !bcrypt.compareSync(password, user.password)) {
-		let error = new Error('Credenciales inválidas');
+		const error = new Error('Credenciales inválidas');
 		error.status = 401;
 		throw error;
 	}
+
 	const token = sign(user);
+
 	return {
 		token,
 		membership: user.membership,
 		maxReadings: user.getAllowedReadingsMax(),
 		role: user.role,
+		avatarUrl: user.avatar?.url ?? null
 	};
 };

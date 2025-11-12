@@ -11,7 +11,11 @@ const userSchema = new Schema({
     membership: { type: String, enum: Object.values(MembershipType), default: MembershipType.BASIC },
     shelf: { type: Schema.Types.ObjectId, ref: 'Shelf', required: false },
     role: { type: String, enum: Object.values(RoleType), default: RoleType.USER },
-    reviews: { type: Schema.Types.ObjectId, ref: 'Review' }
+    reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
+    avatar: {
+        url: { type: String, required: true },
+        publicId: { type: String, default: null }
+    }
 });
 
 userSchema.methods.getAllowedReadingsMax = function () {

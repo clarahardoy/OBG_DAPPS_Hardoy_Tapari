@@ -43,4 +43,18 @@ export const registerValidator = Joi.object({
         "string.base": "Debe ser un texto.",
         "any.only": "El rol debe ser admin o user."
     }),
+    avatarUrl: Joi.string().uri().required().custom((value, helpers) => {
+        try {
+            const u = new URL(value);
+            if (u.hostname !== "res.cloudinary.com") {
+                return helpers.error("any.invalid");
+            }
+            return value;
+        } catch { return helpers.error("string.uri"); }
+    }).messages({
+        "any.invalid": "La URL del avatar debe ser de Cloudinary."
+    }),
+    avatarPublicId: Joi.string().allow(null, '').messages({
+        "string.base": "El publicId debe ser un texto."
+    }),
 });
