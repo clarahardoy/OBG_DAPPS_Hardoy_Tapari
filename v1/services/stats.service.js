@@ -1,12 +1,3 @@
-/* ======================= ESTADÍSTICAS ======================= */
-/*
-   - getBooksReadByYear(userId, year)
-   - getBooksReadByMonth(userId, year, month)   // month: 1..12
-   - getTotalPagesRead(userId, { year, month })
-   - getMostReadGenre(userId, { year, month })
-   - getUserReadingStats(userId, { year, month })
-   Notas: solo cuenta status === "FINISHED" y usa finishedReading dentro del rango.
-*/
 import { buildRange } from "../utils/build-range.js";
 import { ShelfService } from "./shelf.service.js";
 import Reading from "../models/reading.model.js";
@@ -96,20 +87,55 @@ export const StatsService = {
         return { genre: rows[0]._id, count: rows[0].count };
     },
 
+    // LIBROS POR GÉNERO (conteo por cada género leído)
+    getBooksCountByGenre: async (userId, { year, month } = {}) => {
+        const shelfIds = await ShelfService.getUserShelvesIds(userId);
+
+        if (shelfIds.length === 0) return [];
+        const range = buildRange({ year, month });
+
+        const rows = await Reading.aggregate([
+            {
+                $match: {
+                    shelfId: { $in: shelfIds },
+                    status: "FINISHED",
+                    ...(range ? { finishedReading: { $gte: range.start, $lt: range.end } } : {})
+                }
+            },
+            {
+                $lookup: {
+                    from: Book.collection.name,
+                    localField: "googleBooksId",
+                    foreignField: "_id",
+                    as: "book"
+                }
+            },
+            { $unwind: "$book" },
+            // descartamos libros sin género definido
+            { $match: { "book.genre": { $exists: true, $ne: null, $ne: "" } } },
+            { $group: { _id: "$book.genre", count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } }
+        ]);
+
+        return rows.map(r => ({ genre: r._id, count: r.count }));
+    },
+
     // Wrapper de estadísticas
     getUserReadingStats: async (userId, { year, month } = {}) => {
-        const [booksYear, booksMonth, totalPages, topGenre] = await Promise.all([
+        const [booksYear, booksMonth, totalPages, topGenre, booksByGenre] = await Promise.all([
             year ? StatsService.getBooksReadByYear(userId, year) : null,
             year && month ? StatsService.getBooksReadByMonth(userId, year, month) : null,
             StatsService.getTotalPagesRead(userId, { year, month }),
-            StatsService.getMostReadGenre(userId, { year, month })
+            StatsService.getMostReadGenre(userId, { year, month }),
+            StatsService.getBooksCountByGenre(userId, { year, month })
         ]);
 
         return {
             booksReadYear: booksYear,
             booksReadMonth: booksMonth,
             totalPagesRead: totalPages,
-            mostReadGenre: topGenre
+            mostReadGenre: topGenre,
+            booksByGenre
         };
     }
 };
