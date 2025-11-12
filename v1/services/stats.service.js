@@ -7,7 +7,6 @@ import Book from "../models/book.model.js";
 const toObjectIds = (ids) => ids.map(id => new mongoose.Types.ObjectId(id));
 const hasYM = (year, month) => Number.isInteger(year) || Number.isInteger(month);
 
-// Si no vienen, usamos año/mes actuales
 const withDefaults = (year, month) => {
     const now = new Date();
     const y = Number.isInteger(year) ? year : now.getFullYear();
@@ -15,7 +14,7 @@ const withDefaults = (year, month) => {
     return { year: y, month: m };
 };
 
-const GENERIC_TOKENS = ["General", "Fiction", "Juvenile Fiction", "Nonfiction", "Family", "Family Life"];
+const GENERIC_TOKENS = ["General", "Fiction", "Juvenile Fiction", "Nonfiction", "Family", "Family Life", "Contemporary"];
 
 export const StatsService = {
 
@@ -45,20 +44,16 @@ export const StatsService = {
         });
     },
 
-    // PÁGINAS LEÍDAS
-    getTotalPagesRead: async (userId, { year, month } = {}) => {
+    // PÁGINAS LEÍDAS (HISTÓRICO)
+    getTotalPagesRead: async (userId) => {
         const shelfIds = await ShelfService.getUserShelvesIds(userId);
         if (shelfIds.length === 0) return 0;
-
-        const applyRange = hasYM(year, month);
-        const range = applyRange ? buildRange({ year, month }) : null;
 
         const rows = await Reading.aggregate([
             {
                 $match: {
                     shelfId: { $in: toObjectIds(shelfIds) },
-                    status: "FINISHED",
-                    ...(applyRange ? { finishedReading: { $gte: range.start, $lt: range.end } } : {})
+                    status: "FINISHED"
                 }
             },
             {
@@ -73,13 +68,13 @@ export const StatsService = {
             { $group: { _id: null, total: { $sum: "$book.pages" } } }
         ]);
 
+        // Fallback si no hubo match con Book
         if (!rows?.[0]?.total) {
             const rows2 = await Reading.aggregate([
                 {
                     $match: {
                         shelfId: { $in: toObjectIds(shelfIds) },
-                        status: "FINISHED",
-                        ...(applyRange ? { finishedReading: { $gte: range.start, $lt: range.end } } : {})
+                        status: "FINISHED"
                     }
                 },
                 { $group: { _id: null, total: { $sum: "$pageCount" } } }
@@ -89,20 +84,16 @@ export const StatsService = {
         return rows[0].total;
     },
 
-    // GÉNERO MÁS LEÍDO
-    getMostReadGenre: async (userId, { year, month } = {}) => {
+    // GÉNERO MÁS LEÍDO (HISTÓRICO)
+    getMostReadGenre: async (userId) => {
         const shelfIds = await ShelfService.getUserShelvesIds(userId);
         if (shelfIds.length === 0) return null;
-
-        const applyRange = hasYM(year, month);
-        const range = applyRange ? buildRange({ year, month }) : null;
 
         const rows = await Reading.aggregate([
             {
                 $match: {
                     shelfId: { $in: toObjectIds(shelfIds) },
-                    status: "FINISHED",
-                    ...(applyRange ? { finishedReading: { $gte: range.start, $lt: range.end } } : {})
+                    status: "FINISHED"
                 }
             },
             {
@@ -114,9 +105,9 @@ export const StatsService = {
                 }
             },
             { $unwind: "$book" },
-
             { $match: { "book.genre": { $exists: true, $ne: null, $ne: "" } } },
 
+            // Normalización de géneros
             {
                 $addFields: {
                     _genres: {
@@ -227,20 +218,16 @@ export const StatsService = {
         return { genre: rows[0]._id, count: rows[0].count };
     },
 
-    // LIBROS POR GÉNERO
-    getBooksCountByGenre: async (userId, { year, month } = {}) => {
+    // LIBROS POR GÉNERO (HISTÓRICO)
+    getBooksCountByGenre: async (userId) => {
         const shelfIds = await ShelfService.getUserShelvesIds(userId);
         if (shelfIds.length === 0) return [];
-
-        const applyRange = hasYM(year, month);
-        const range = applyRange ? buildRange({ year, month }) : null;
 
         const rows = await Reading.aggregate([
             {
                 $match: {
                     shelfId: { $in: toObjectIds(shelfIds) },
-                    status: "FINISHED",
-                    ...(applyRange ? { finishedReading: { $gte: range.start, $lt: range.end } } : {})
+                    status: "FINISHED"
                 }
             },
             {
@@ -254,6 +241,7 @@ export const StatsService = {
             { $unwind: "$book" },
             { $match: { "book.genre": { $exists: true, $ne: null, $ne: "" } } },
 
+            // Normalización idéntica
             {
                 $addFields: {
                     _genres: {
@@ -369,9 +357,9 @@ export const StatsService = {
         const [booksYear, booksMonth, totalPages, topGenre, booksByGenre] = await Promise.all([
             StatsService.getBooksReadByYear(userId, y),
             StatsService.getBooksReadByMonth(userId, y, m),
-            StatsService.getTotalPagesRead(userId, { year: y, month: m }),
-            StatsService.getMostReadGenre(userId, { year: y, month: m }),
-            StatsService.getBooksCountByGenre(userId, { year: y, month: m })
+            StatsService.getTotalPagesRead(userId),
+            StatsService.getMostReadGenre(userId),
+            StatsService.getBooksCountByGenre(userId)
         ]);
 
         return {
