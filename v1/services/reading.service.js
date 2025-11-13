@@ -178,7 +178,23 @@ export const ReadingService = {
 		}
 		return deleted;
 	},
-
+	deleteReadingsByShelfId: async (shelfId) => {
+		try {
+			const result = await Reading.deleteMany({ shelfId });
+			return result;
+		} catch (error) {
+			console.error(
+				'[ReadingService.deleteReadingsByShelfId] ERROR:',
+				error
+			);
+			const err = new Error(
+				'Error al eliminar las lecturas asociadas a la shelf'
+			);
+			err.status = 500;
+			err.cause = error;
+			throw err;
+		}
+	},
 	getReadingsByShelfId: async (shelfId) => {
 		try {
 			if (!shelfId) {

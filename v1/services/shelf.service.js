@@ -41,12 +41,11 @@ export const ShelfService = {
 			}
 			return { message: 'Shelf eliminada con éxito' };
 		} catch (error) {
-			console.error('Error en ShelfService.deleteShelf:', error);
-			if (error.status) throw error;
-			const err = new Error('Error al eliminar la shelf');
-			err.status = 500;
-			err.cause = error;
-			throw err;
+			console.error('[ShelfService.deleteShelf] ERROR:', error);
+			if (!error.status) {
+				error.status = 500;
+			}
+			throw error;
 		}
 	},
 
