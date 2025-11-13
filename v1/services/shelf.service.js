@@ -35,11 +35,18 @@ export const ShelfService = {
 			await ReadingService.deleteReadingsByShelfId(shelfId);
 			const deletedShelf = await Shelf.findByIdAndDelete(shelfId);
 			if (!deletedShelf) {
-				throw new Error('Shelf no encontrada');
+				const error = new Error('Shelf no encontrada');
+				error.status = 404;
+				throw error;
 			}
 			return { message: 'Shelf eliminada con éxito' };
 		} catch (error) {
-			throw new Error('Error al eliminar la shelf', error, { status: 400 });
+			console.error('Error en ShelfService.deleteShelf:', error);
+			if (error.status) throw error;
+			const err = new Error('Error al eliminar la shelf');
+			err.status = 500;
+			err.cause = error;
+			throw err;
 		}
 	},
 
